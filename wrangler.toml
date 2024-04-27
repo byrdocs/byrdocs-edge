@@ -7,6 +7,10 @@ compatibility_date = "2024-04-23"
 name = "COUNTER"
 class_name = "Counter"
 
+[[migrations]]
+tag = "v1"
+new_classes = ["Counter"]
+
 
 [site]
 bucket = "./byrdocs-frontend/dist"

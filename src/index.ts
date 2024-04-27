@@ -17,6 +17,7 @@ type Bindings = {
 	COUNTER: DurableObjectNamespace<Counter<Bindings>>;
 	JWT_SECRET: string;
 	FILE_SERVER: string;
+	TOKEN: string;
 }
 
 const loginErrorHTML = loginHTML.split("<!--ERRORMSG-->")
@@ -65,9 +66,24 @@ export default new Hono<{ Bindings: Bindings }>()
 			}
 		}
 	})
+	.get("/rank", async c => {
+		const token = c.req.query("token")
+		if (token !== c.env.TOKEN) {
+			return c.json({ error: "Forbidden" }, { status: 403 })
+		}
+		const id: DurableObjectId = c.env.COUNTER.idFromName("counter");
+		const stub: DurableObjectStub<Counter<Bindings>> = c.env.COUNTER.get(id);
+		const data = await stub.list()
+		return c.json(data)
+	})
 	// @ts-ignore
 	.get("/files/*", async c => {
 		const path = c.req.path.slice(7)
+		if (!path.startsWith("covers/")) {
+			const id: DurableObjectId = c.env.COUNTER.idFromName("counter");
+			const stub: DurableObjectStub<Counter<Bindings>> = c.env.COUNTER.get(id);
+			c.executionCtx.waitUntil(stub.add(path))
+		}
 		const url = c.env.FILE_SERVER + (c.env.FILE_SERVER.endsWith("/") ? "" : "/") + path
 		return fetch(url)
 	})
