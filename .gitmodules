@@ -1,0 +1,3 @@
+[submodule "byrdocs-frontend"]
+	path = byrdocs-frontend
+	url = https://github.com/byrdocs/byrdocs-frontend

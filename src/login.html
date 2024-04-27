@@ -1,0 +1,60 @@
+<html>
+
+<head>
+	<title>登录 BYR Docs</title>
+	<meta charset="UTF-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<script src="https://cdn.tailwindcss.com"></script>
+	<link rel="icon" href="data:;base64,=">
+
+</head>
+
+<body class="h-[100vh] flex flex-col">
+	<div class="md:rounded-lg border bg-card text-card-foreground shadow-sm w-full md:w-[500px] m-auto p-4">
+		<div class="flex flex-col p-6 pb-0 space-y-1">
+			<h3 class="whitespace-nowrap font-semibold tracking-tight text-2xl">登录 BYR Docs</h3>
+			<p class="text-sm text-muted-foreground pt-2">
+				由于您没有使用北邮校园网(IPv6)访问本站，所以我们需要使用
+				<a href="https://auth.bupt.edu.cn/authserver/login" target="_blank"
+					class="text-blue-500 hover:underline">北邮统一认证</a>
+				确认您的身份。
+			</p>
+			<p class="text-sm text-red-500">
+				<!--ERRORMSG-->
+			</p>
+		</div>
+		<form method="post" action="/login">
+			<div class="p-6 pt-2 space-y-4">
+				<div class="space-y-2">
+					<label
+						class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+						for="student-id">
+						学号
+					</label>
+					<input
+						class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+						id="studentId" type="text" name="studentId" minlength="10" maxlength="10" required pattern="20\d{8}" />
+				</div>
+				<div class="space-y-2">
+					<label
+						class="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+						for="password">
+						密码
+					</label>
+					<input
+						class="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+						id="password" type="password" name="password" required />
+				</div>
+			</div>
+			<div class="flex items-center p-6 pt-0">
+				<button
+					class="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-black text-white hover:bg-black/80 h-10 px-4 py-2 w-full"
+					type="submit" id="login">
+					登录
+				</button>
+			</div>
+		</form>
+	</div>
+</body>
+
+</html>
