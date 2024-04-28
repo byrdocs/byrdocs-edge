@@ -33,5 +33,5 @@ export async function login(username: string, password: string) {
         }
         throw new Error('Failed to make the initial request: ' + response.status + ' ' + response.statusText);
     }
-	return true
+    return true
 }
