@@ -1,6 +1,6 @@
 #:schema node_modules/wrangler/config-schema.json
 name = "byrdocs-edge"
-main = "src/index.ts"
+main = "src/index.tsx"
 compatibility_date = "2024-04-23"
 
 [[durable_objects.bindings]]
