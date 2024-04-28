@@ -3,7 +3,7 @@ import type { FC } from 'hono/jsx'
 
 const Layout: FC = (props) => {
     return (
-        <html>
+        <html lang='zh-CN'>
             <head>
                 <title>登录 BYR Docs</title>
                 <meta charset="UTF-8" />
