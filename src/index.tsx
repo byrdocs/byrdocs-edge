@@ -29,12 +29,14 @@ export default new Hono<{ Bindings: Bindings }>()
         manifest
     }))
     .get("/login", async c => {
-        return c.render(<Login />)
+        const ip = c.req.header("CF-Connecting-IP") || "未知"
+        return c.render(<Login ip={ip}/>)
     })
     .post("/login", async c => {
+        const ip = c.req.header("CF-Connecting-IP") || "未知"
         const { studentId, password } = await c.req.parseBody()
         if (typeof studentId !== "string" || typeof password !== "string") {
-            return c.render(<Login errorMsg="输入不合法" />)
+            return c.render(<Login errorMsg="输入不合法" ip={ip}/>)
         }
         try {
             if (await login(studentId, password)) {
@@ -47,9 +49,9 @@ export default new Hono<{ Bindings: Bindings }>()
                 })
                 return c.redirect("/")
             }
-            return c.render(<Login errorMsg="可能是用户名或密码错误" />)
+            return c.render(<Login errorMsg="可能是用户名或密码错误" ip={ip}/>)
         } catch (e) {
-            return c.render(<Login errorMsg={(e as Error).message || e?.toString() || "未知错误"} />)
+            return c.render(<Login errorMsg={(e as Error).message || e?.toString() || "未知错误"} ip={ip}/>)
         }
     })
     .use(async (c, next) => {
