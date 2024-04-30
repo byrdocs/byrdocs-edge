@@ -98,11 +98,11 @@ export const Login: FC<{ errorMsg?: string, ip: string }> = ({ errorMsg, ip }) =
                             本项目仅对北京邮电大学在校学生提供服务。若您未通过 IPv6 访问本站或您的 IPv6 地址不属于北邮校园网范围内，我们将需通过北邮统一认证来验证您的身份。
                         </p>
                         <h4 className="font-bold dark:text-gray-400">
-                            我的设备支持 IPv6 吗？
+                            我的网络支持 IPv6 吗？
                         </h4>
                         <p className="text-sm dark:text-gray-400">
-                            您可以通过 <a href="https://test-ipv6.com/" target="_blank" className="text-blue-500 hover:underline dark:text-blue-400 dark:hover:text-blue-300">IPv6 测试网站</a> 来确认您的设备是否支持 IPv6。
-                            如果您处于北邮校园网环境中，您的网络应当已支持 IPv6。如果上述检测未通过，请检查您设备的网络设置。
+                            您可以通过 <a href="https://test-ipv6.com/" target="_blank" className="text-blue-500 hover:underline dark:text-blue-400 dark:hover:text-blue-300">IPv6 测试网站</a> 来确认您的网络是否支持 IPv6。
+                            如果您处于北邮校园网环境中，您的网络应当已支持 IPv6。如果上述检测未通过，请检查您的设备的网络设置。
                         </p>
                         <h4 className="font-bold dark:text-gray-400">
                             我已经使用了 IPv6，为什么还需要登录？
