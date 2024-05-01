@@ -47,7 +47,8 @@ export default new Hono<{ Bindings: Bindings }>()
                     sameSite: "Strict",
                     path: "/"
                 })
-                return c.redirect("/")
+                const to = c.req.query("to") || "/"
+                return c.redirect(to)
             }
             return c.render(<Login errorMsg="可能是用户名或密码错误" ip={ip}/>)
         } catch (e) {
@@ -63,7 +64,10 @@ export default new Hono<{ Bindings: Bindings }>()
             if (login === "1") {
                 await next()
             } else {
-                return c.redirect("/login")
+                const toq = new URL(c.req.url).searchParams
+                if ((c.req.path === "" || c.req.path === '/') && toq.size === 0) return c.redirect("/login")
+                const to = c.req.path + (toq.size > 0 ? "?" + toq.toString() : "")
+                return c.redirect("/login?" + new URLSearchParams({ to }).toString())
             }
         }
     })

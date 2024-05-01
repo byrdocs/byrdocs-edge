@@ -10,6 +10,15 @@ const Layout: FC = (props) => {
                 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
                 <script src="https://cdn.tailwindcss.com"></script>
                 <link rel="icon" href="/logo_512.png" type='image/png' />
+                <meta name="description" content="北京邮电大学资料分享平台，旨在使校内学生更方便地获取与北邮课程有关的教育资源，包括电子书籍、考试题目和复习资料等。" />
+                <meta name="keywords" content="北邮, 北京邮电大学, 资料, 电子书籍, 考试题目, 复习资料" />
+                <meta name="author" content="BYR Docs" />
+                <meta property="og:image" content="/logo_512.png" />
+                <meta property="og:image:width" content="512" />
+                <meta property="og:image:height" content="512" />
+                <meta property="og:title" content="BYR Docs" />
+                <meta property="og:description" content="北京邮电大学资料分享平台，旨在使校内学生更方便地获取与北邮课程有关的教育资源，包括电子书籍、考试题目和复习资料等。" />
+                <meta property="og:type" content="website" />
             </head>
             <body>
                 {props.children}
@@ -25,6 +34,11 @@ const Layout: FC = (props) => {
                             document.getElementById("loginCard").classList.remove("hidden");
                             document.getElementById("explainationCard").classList.add("hidden");
                         });
+                        const q = new URLSearchParams(window.location.search);
+                        const to = q.get("to");
+                        if (to) {
+                            document.getElementById("loginForm").action = "/login?" + new URLSearchParams({ to }).toString();
+                        }
                     </script>
                 `}
             </body>
@@ -51,7 +65,7 @@ export const Login: FC<{ errorMsg?: string, ip: string }> = ({ errorMsg, ip }) =
                         </p>
                         {errorMsg && <p className="text-sm text-red-500 dark:text-red-400">{errorMsg}</p>}
                     </div>
-                    <form method="post" action="/login">
+                    <form method="post" action="/login" id="loginForm">
                         <div className="p-6 pt-2 space-y-4">
                             <div className="space-y-2">
                                 <label
