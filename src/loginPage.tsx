@@ -10,6 +10,7 @@ const Layout: FC = (props) => {
                 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
                 <script src="https://cdn.tailwindcss.com"></script>
                 <link rel="icon" href="/logo_512.png" type='image/png' />
+                <meta name="baidu-site-verification" content="codeva-45ccQLVm18" />
                 <meta name="description" content="北京邮电大学资料分享平台，旨在使校内学生更方便地获取与北邮课程有关的教育资源，包括电子书籍、考试题目和复习资料等。" />
                 <meta name="keywords" content="北邮, 北京邮电大学, 资料, 电子书籍, 考试题目, 复习资料" />
                 <meta name="author" content="BYR Docs" />
