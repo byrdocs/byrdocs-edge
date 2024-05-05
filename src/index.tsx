@@ -1,5 +1,4 @@
-import { Hono } from 'hono';
-import { serveStatic } from 'hono/cloudflare-workers'
+import { Hono, Context } from 'hono';
 import { getSignedCookie, setSignedCookie } from 'hono/cookie'
 
 import { Counter } from './counter';
@@ -11,8 +10,6 @@ import { buptSubnets } from '../bupt';
 import { Login } from './loginPage';
 import { login } from './login';
 
-import manifest from '__STATIC_CONTENT_MANIFEST'
-
 type Bindings = {
     COUNTER: DurableObjectNamespace<Counter<Bindings>>;
     JWT_SECRET: string;
@@ -23,11 +20,13 @@ type Bindings = {
 
 const ipChecker = createChecker(buptSubnets);
 
+async function page(c: Context) {
+    const url = new URL(c.req.url, "https://byrdocs-frontend.pages.dev/")
+    return fetch("https://byrdocs-frontend.pages.dev" + c.req.url.slice(url.origin.length))
+}
+
 export default new Hono<{ Bindings: Bindings }>()
-    .get("/logo_512.png", serveStatic({
-        root: './',
-        manifest
-    }))
+    .get("/logo_512.png", page)
     .get("/login", async c => {
         const ip = c.req.header("CF-Connecting-IP") || "未知"
         return c.render(<Login ip={ip}/>)
@@ -91,12 +90,4 @@ export default new Hono<{ Bindings: Bindings }>()
         const url = c.env.FILE_SERVER + (c.env.FILE_SERVER.endsWith("/") ? "" : "/") + path
         return fetch(url)
     })
-    .use(serveStatic({
-        root: './',
-        manifest
-    }))
-    .use(serveStatic({
-        root: './',
-        manifest,
-        rewriteRequestPath: path => '/index.html'
-    }))
+    .use(page)
