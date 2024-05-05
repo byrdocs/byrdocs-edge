@@ -29,10 +29,12 @@ export default new Hono<{ Bindings: Bindings }>()
     .get("/logo_512.png", page)
     .get("/login", async c => {
         const ip = c.req.header("CF-Connecting-IP") || "未知"
+        if (ip !== "未知" && ipChecker(ip)) return c.redirect("/")
         return c.render(<Login ip={ip}/>)
     })
     .post("/login", async c => {
         const ip = c.req.header("CF-Connecting-IP") || "未知"
+        if (ip !== "未知" && ipChecker(ip)) return c.redirect("/")
         const { studentId, password } = await c.req.parseBody()
         if (typeof studentId !== "string" || typeof password !== "string") {
             return c.render(<Login errorMsg="输入不合法" ip={ip}/>)
