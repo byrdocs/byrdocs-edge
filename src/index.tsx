@@ -56,8 +56,9 @@ export default new Hono<{ Bindings: Bindings }>()
         }
     })
     .use(async (c, next) => {
+        const token = c.req.query("token")
         const ip = c.req.header("CF-Connecting-IP")
-        if (ip && ipChecker(ip)) {
+        if (token === c.env.TOKEN || ip && ipChecker(ip)) {
             await next()
         } else {
             const login = await getSignedCookie(c, c.env.JWT_SECRET, "login")
