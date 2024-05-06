@@ -29,12 +29,12 @@ export default new Hono<{ Bindings: Bindings }>()
     .get("/logo_512.png", page)
     .get("/login", async c => {
         const ip = c.req.header("CF-Connecting-IP") || "未知"
-        if (ip !== "未知" && ipChecker(ip)) return c.redirect("/")
+        if (ip !== "未知" && ipChecker(ip)) return c.redirect(c.req.query("to") || "/")
         return c.render(<Login ip={ip}/>)
     })
     .post("/login", async c => {
         const ip = c.req.header("CF-Connecting-IP") || "未知"
-        if (ip !== "未知" && ipChecker(ip)) return c.redirect("/")
+        if (ip !== "未知" && ipChecker(ip)) return c.redirect(c.req.query("to") || "/")
         const { studentId, password } = await c.req.parseBody()
         if (typeof studentId !== "string" || typeof password !== "string") {
             return c.render(<Login errorMsg="输入不合法" ip={ip}/>)
@@ -48,8 +48,7 @@ export default new Hono<{ Bindings: Bindings }>()
                     sameSite: "Strict",
                     path: "/"
                 })
-                const to = c.req.query("to") || "/"
-                return c.redirect(to)
+                return c.redirect(c.req.query("to") || "/")
             }
             return c.render(<Login errorMsg="可能是用户名或密码错误" ip={ip}/>)
         } catch (e) {
