@@ -5,7 +5,7 @@ const Layout: FC = ({ current, children }: PropsWithChildren<{ current?: string 
     return (
         <html lang='zh-CN'>
             <head>
-                <title>登录 BYR Docs</title>
+                <title>BYR Docs</title>
                 <meta charset="UTF-8" />
                 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
                 <script src="https://cdn.tailwindcss.com"></script>
@@ -41,9 +41,10 @@ const Layout: FC = ({ current, children }: PropsWithChildren<{ current?: string 
                             e.addEventListener("click", (e) => {
                                 go(stack.pop() || 'vpn')
                             });
-                        document.getElementById("auth").addEventListener("click", (e) => {
-                            go('login')
-                        })
+                        for (const e of document.getElementsByClassName("login"))
+                            e.addEventListener("click", (e) => {
+                                go('login')
+                            });
                         document.getElementById("loginExplaination").addEventListener("click", (e) => {
                             go('loginExplain')
                         })
@@ -90,8 +91,8 @@ export const Login: FC<{ errorMsg?: string, ip: string }> = ({ errorMsg, ip }) =
                         </P>
                         <P>
                             您也可以使用
-                            <button target="_blank" id="auth"
-                                className={"text-blue-500 hover:underline dark:text-blue-400 dark:hover:text-blue-300 "}>
+                            <button target="_blank"
+                                className={"text-blue-500 hover:underline dark:text-blue-400 dark:hover:text-blue-300 login"}>
                                 北邮统一认证
                             </button>
                             账号登录。
@@ -192,10 +193,10 @@ export const Login: FC<{ errorMsg?: string, ip: string }> = ({ errorMsg, ip }) =
                             或
                             <Link to="https://vpn.bupt.edu.cn/" className='mx-1'>VPN</Link>
                             访问本站，也可以使用
-                            <button target="_blank" id="auth"
-                                className={"text-blue-500 hover:underline dark:text-blue-400 dark:hover:text-blue-300 "}>
+                            <button
+                                className={"text-blue-500 hover:underline dark:text-blue-400 dark:hover:text-blue-300 login"}>
                                 北邮统一认证
-                            </button> 登录。
+                            </button>登录。
                         </P>
                     </div>
                     <div className="flex items-center p-6">
