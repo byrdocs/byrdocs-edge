@@ -37,6 +37,7 @@ async function setCookie(c: Context) {
 
 export default new Hono<{ Bindings: Bindings }>()
     .get("/logo_512.png", page)
+    .get("/placeholder.svg", page)
     .get("/login", async c => {
         const ip = c.req.header("CF-Connecting-IP") || "未知"
         if (ip !== "未知" && ipChecker(ip)) return c.redirect(c.req.query("to") || "/")
