@@ -25,6 +25,16 @@ async function page(c: Context) {
     return fetch("https://byrdocs-frontend.pages.dev" + c.req.url.slice(url.origin.length))
 }
 
+async function setCookie(c: Context) {
+    await setSignedCookie(c, "login", "1", c.env.JWT_SECRET, {
+        maxAge: 2592000,
+        secure: true,
+        httpOnly: true,
+        sameSite: "Strict",
+        path: "/"
+    })
+}
+
 export default new Hono<{ Bindings: Bindings }>()
     .get("/logo_512.png", page)
     .get("/login", async c => {
@@ -41,13 +51,7 @@ export default new Hono<{ Bindings: Bindings }>()
         }
         try {
             if (await login(studentId, password)) {
-                await setSignedCookie(c, "login", "1", c.env.JWT_SECRET, {
-                    maxAge: 2592000,
-                    secure: true,
-                    httpOnly: true,
-                    sameSite: "Strict",
-                    path: "/"
-                })
+                await setCookie(c)
                 return c.redirect(c.req.query("to") || "/")
             }
             return c.render(<Login errorMsg="可能是用户名或密码错误" ip={ip}/>)
@@ -58,8 +62,12 @@ export default new Hono<{ Bindings: Bindings }>()
     .use(async (c, next) => {
         const token = c.req.query("token")
         const ip = c.req.header("CF-Connecting-IP")
-        if (token === c.env.TOKEN || ip && ipChecker(ip)) {
+        console.log(token, )
+        if (ip && ipChecker(ip)) {
             await next()
+        } else if (token === c.env.TOKEN) {
+            await setCookie(c)
+            return c.redirect("/")
         } else {
             const login = await getSignedCookie(c, c.env.JWT_SECRET, "login")
             if (login === "1") {
