@@ -62,7 +62,6 @@ export default new Hono<{ Bindings: Bindings }>()
     .use(async (c, next) => {
         const token = c.req.query("token")
         const ip = c.req.header("CF-Connecting-IP")
-        console.log(token, )
         if (ip && ipChecker(ip)) {
             await next()
         } else if (token === c.env.TOKEN) {
