@@ -102,6 +102,13 @@ export const Login: FC<{ errorMsg?: string, ip: string }> = ({ errorMsg, ip }) =
                 <div className={"md:rounded-lg border bg-card text-card-foreground shadow-sm w-full md:w-[500px] m-auto p-4 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 " + (errorMsg ? '' : 'hidden')} id="loginCard">
                     <div className="flex flex-col p-6 pb-2 space-y-1">
                         <h3 className="whitespace-nowrap font-semibold tracking-tight text-2xl dark:text-white">登录 BYR Docs</h3>
+                        <P>
+                            请使用
+                            <Link to="https://auth.bupt.edu.cn/authserver/login" className='mx-1'>
+                                北邮统一认证
+                            </Link>
+                            的账号登录。
+                        </P>
                         {errorMsg && <p className="text-sm text-red-500 dark:text-red-400">{errorMsg}</p>}
                     </div>
                     <form method="post" action="/login" id="loginForm">
@@ -213,7 +220,7 @@ export const Login: FC<{ errorMsg?: string, ip: string }> = ({ errorMsg, ip }) =
                             此登录是如何工作的？
                         </h3>
                         <P>
-                            为了保护您的隐私与安全，本站使用
+                            本站使用
                             <Link to="https://auth.bupt.edu.cn/authserver/login">北京邮电大学统一认证系统</Link>
                             来验证用户身份。以下是我们的登录流程和隐私保护措施的详细说明：
                         </P>
