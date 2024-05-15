@@ -38,26 +38,29 @@ async function setCookie(c: Context) {
 export default new Hono<{ Bindings: Bindings }>()
     .get("/logo_512.png", page)
     .get("/placeholder.svg", page)
+    .get("/filesize.json", async c =>
+        fetch(c.env.FILE_SERVER + (c.env.FILE_SERVER.endsWith("/") ? "" : "/") + "filesize.json")
+    )
     .get("/login", async c => {
         const ip = c.req.header("CF-Connecting-IP") || "未知"
         if (ip !== "未知" && ipChecker(ip)) return c.redirect(c.req.query("to") || "/")
-        return c.render(<Login ip={ip}/>)
+        return c.render(<Login ip={ip} />)
     })
     .post("/login", async c => {
         const ip = c.req.header("CF-Connecting-IP") || "未知"
         if (ip !== "未知" && ipChecker(ip)) return c.redirect(c.req.query("to") || "/")
         const { studentId, password } = await c.req.parseBody()
         if (typeof studentId !== "string" || typeof password !== "string") {
-            return c.render(<Login errorMsg="输入不合法" ip={ip}/>)
+            return c.render(<Login errorMsg="输入不合法" ip={ip} />)
         }
         try {
             if (await login(studentId, password)) {
                 await setCookie(c)
                 return c.redirect(c.req.query("to") || "/")
             }
-            return c.render(<Login errorMsg="可能是用户名或密码错误" ip={ip}/>)
+            return c.render(<Login errorMsg="可能是用户名或密码错误" ip={ip} />)
         } catch (e) {
-            return c.render(<Login errorMsg={(e as Error).message || e?.toString() || "未知错误"} ip={ip}/>)
+            return c.render(<Login errorMsg={(e as Error).message || e?.toString() || "未知错误"} ip={ip} />)
         }
     })
     .use(async (c, next) => {
