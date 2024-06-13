@@ -189,7 +189,8 @@ export const Login: FC<{ errorMsg?: string, ip: string }> = ({ errorMsg, ip }) =
                             我已经使用了 IPv6，为什么还需要登录？
                         </h4>
                         <P>
-                            尽管您已启用 IPv6，但由于本站同时支持 IPv4 和 IPv6，您可能还是通过 IPv4 访问了本站。您可以尝试提高 IPv6 的使用优先级或禁用 IPv4。
+                            尽管您已启用 IPv6，但由于本站同时支持 IPv4 和 IPv6，您可能还是通过 IPv4 访问了本站。您可以尝试提高 IPv6 的使用优先级或禁用 IPv4，或者使用 IPv6 only 的网站镜像：
+                            <Link to="https://v6.byrdocs.org/">v6.byrdocs.org</Link>。
                         </P>
                         <h4 className="font-bold dark:text-gray-400">
                             如果我不在校内，我该怎么办？
