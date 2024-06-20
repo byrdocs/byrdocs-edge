@@ -264,6 +264,10 @@ export const Login: FC<{ errorMsg?: string, ip: string }> = ({ errorMsg, ip }) =
                         <Link to="https://github.com/orgs/byrdocs/discussions">
                             GitHub Discussions
                         </Link>
+                        <span className="mx-2">|</span>
+                        <Link to="https://qm.qq.com/q/sxv5SAKP0A">
+                            QQ 群
+                        </Link>
                     </p>
                 </footer>
             </div>
