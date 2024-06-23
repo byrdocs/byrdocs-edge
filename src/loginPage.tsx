@@ -84,19 +84,24 @@ export const Login: FC<{ errorMsg?: string, ip: string }> = ({ errorMsg, ip }) =
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z" />
                             </svg>
                             ，我们无法确定您的身份，请您考虑使用
+                            <button target="_blank"
+                                className={"text-blue-500 hover:underline dark:text-blue-400 dark:hover:text-blue-300 login"}>
+                                北邮统一认证
+                            </button>
+                            账号登录。
                             {/* <Link to="https://webvpn.bupt.edu.cn/" className='mx-1'>WebVPN</Link>
-                            或 */}
+                            或
                             <Link to="https://vpn.bupt.edu.cn/" className='mx-1'>VPN</Link>
-                            。
+                            。*/}
                         </P>
-                        <P>
+                        {/* <P>
                             您也可以使用
                             <button target="_blank"
                                 className={"text-blue-500 hover:underline dark:text-blue-400 dark:hover:text-blue-300 login"}>
                                 北邮统一认证
                             </button>
                             账号登录。
-                        </P>
+                        </P> */}
                     </div>
                 </div> : null}
                 <div className={"md:rounded-lg border bg-card text-card-foreground shadow-sm w-full md:w-[500px] m-auto p-4 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 " + (errorMsg ? '' : 'hidden')} id="loginCard">
