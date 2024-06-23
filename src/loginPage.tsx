@@ -39,7 +39,7 @@ const Layout: FC = ({ current, children }: PropsWithChildren<{ current?: string 
                             });
                         for (const e of document.getElementsByClassName("return"))
                             e.addEventListener("click", (e) => {
-                                go(stack.pop() || 'vpn')
+                                go(stack.pop() || 'login')
                             });
                         for (const e of document.getElementsByClassName("login"))
                             e.addEventListener("click", (e) => {
@@ -73,11 +73,11 @@ function P({ children, className }: PropsWithChildren<{ className?: string }>) {
 
 export const Login: FC<{ errorMsg?: string, ip: string }> = ({ errorMsg, ip }) => {
     return (
-        <Layout current={errorMsg ? 'login' : 'vpn'}>
+        <Layout current={'login'}>
             <div className="min-h-[100vh] flex flex-col dark:bg-black">
-                {!errorMsg ? <div className="md:rounded-lg border bg-card text-card-foreground shadow-sm w-full md:w-[500px] m-auto p-4 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300" id="vpnCard">
-                    <div className="flex flex-col p-6 space-y-1">
-                        <h3 className="whitespace-nowrap font-semibold tracking-tight text-2xl dark:text-white">访问受限</h3>
+                <div className={"md:rounded-lg border bg-card text-card-foreground shadow-sm w-full md:w-[500px] m-auto p-4 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 "} id="loginCard">
+                    <div className="flex flex-col p-6 pb-2 space-y-1">
+                        <h3 className="whitespace-nowrap font-semibold tracking-tight text-2xl dark:text-white">登录 BYR Docs</h3>
                         <P className='pt-2'>
                             您没有使用北邮校园网(IPv6)访问本站
                             <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="mx-[1px] mb-1 w-4 h-4 inline-block cursor-pointer explaination">
@@ -89,30 +89,6 @@ export const Login: FC<{ errorMsg?: string, ip: string }> = ({ errorMsg, ip }) =
                                 北邮统一认证
                             </button>
                             账号登录。
-                            {/* <Link to="https://webvpn.bupt.edu.cn/" className='mx-1'>WebVPN</Link>
-                            或
-                            <Link to="https://vpn.bupt.edu.cn/" className='mx-1'>VPN</Link>
-                            。*/}
-                        </P>
-                        {/* <P>
-                            您也可以使用
-                            <button target="_blank"
-                                className={"text-blue-500 hover:underline dark:text-blue-400 dark:hover:text-blue-300 login"}>
-                                北邮统一认证
-                            </button>
-                            账号登录。
-                        </P> */}
-                    </div>
-                </div> : null}
-                <div className={"md:rounded-lg border bg-card text-card-foreground shadow-sm w-full md:w-[500px] m-auto p-4 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 " + (errorMsg ? '' : 'hidden')} id="loginCard">
-                    <div className="flex flex-col p-6 pb-2 space-y-1">
-                        <h3 className="whitespace-nowrap font-semibold tracking-tight text-2xl dark:text-white">登录 BYR Docs</h3>
-                        <P>
-                            请使用
-                            <Link to="https://auth.bupt.edu.cn/authserver/login" className='mx-1'>
-                                北邮统一认证
-                            </Link>
-                            的账号登录。
                         </P>
                         {errorMsg && <p className="text-sm text-red-500 dark:text-red-400">{errorMsg}</p>}
                     </div>
@@ -202,10 +178,6 @@ export const Login: FC<{ errorMsg?: string, ip: string }> = ({ errorMsg, ip }) =
                         </h4>
                         <P>
                             如果您不在校内，可以使用
-                            <Link to="https://webvpn.bupt.edu.cn/" className='mx-1'>WebVPN</Link>
-                            或
-                            <Link to="https://vpn.bupt.edu.cn/" className='mx-1'>VPN</Link>
-                            访问本站，也可以使用
                             <button
                                 className={"text-blue-500 hover:underline dark:text-blue-400 dark:hover:text-blue-300 login"}>
                                 北邮统一认证
@@ -220,7 +192,7 @@ export const Login: FC<{ errorMsg?: string, ip: string }> = ({ errorMsg, ip }) =
                         </button>
                     </div>
                 </div>
-                <div className="md:rounded-lg border bg-card text-card-foreground shadow-sm w-full md:w-[500px] m-auto p-4 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 hidden my-12" id="loginExplainCard">
+                <div className="md:rounded-lg border bg-card text-card-foreground shadow-sm w-full md:w-[500px] m-auto p-4 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 hidden" id="loginExplainCard">
                     <div className="flex flex-col p-6 pb-0 space-y-1">
                         <h3 className="whitespace-nowrap font-semibold tracking-tight text-2xl dark:text-white mb-4">
                             此登录是如何工作的？
