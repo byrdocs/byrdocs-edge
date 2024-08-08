@@ -95,12 +95,12 @@ export default new Hono<{ Bindings: Bindings }>()
     })
     .get("/files/*", async c => {
         const path = c.req.path.slice(7)
-        if (!path.startsWith("covers/")) {
+        if (path.startsWith("books/") || path.startsWith("tests/") || path.startsWith("docs/")) {
             const id: DurableObjectId = c.env.COUNTER.idFromName("counter");
             const stub: DurableObjectStub<Counter<Bindings>> = c.env.COUNTER.get(id);
             c.executionCtx.waitUntil(stub.add(path))
         }
         const url = c.env.FILE_SERVER + (c.env.FILE_SERVER.endsWith("/") ? "" : "/") + path
-        return fetch(url)
+        return fetch(url, c.req.raw.clone())
     })
     .use(page)
