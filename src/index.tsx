@@ -93,7 +93,7 @@ export default new Hono<{ Bindings: Bindings }>()
         const data = await stub.list()
         return c.json(data)
     })
-    .get("/files/*", async c => {
+    .all("/files/*", async c => {
         const path = c.req.path.slice(7)
         if (path.startsWith("books/") || path.startsWith("tests/") || path.startsWith("docs/")) {
             const id: DurableObjectId = c.env.COUNTER.idFromName("counter");
