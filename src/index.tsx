@@ -64,13 +64,12 @@ export default new Hono<{ Bindings: Bindings }>()
         }
     })
     .use(async (c, next) => {
-        const token = c.req.query("token")
+        const token = c.req.header("X-Byrdocs-Token")
         const ip = c.req.header("CF-Connecting-IP")
         if (ip && ipChecker(ip)) {
             await next()
         } else if (token === c.env.TOKEN) {
-            await setCookie(c)
-            return c.redirect("/")
+            await next()
         } else {
             const login = await getSignedCookie(c, c.env.JWT_SECRET, "login")
             if (login === "1") {
@@ -93,7 +92,11 @@ export default new Hono<{ Bindings: Bindings }>()
         const data = await stub.list()
         return c.json(data)
     })
-    .all("/files/*", async c => {
+    .all("/api/*", async c => {
+        const url = c.env.FILE_SERVER + (c.env.FILE_SERVER.endsWith("/") ? "" : "/") + "/api/" + c.req.path.slice(5)
+        return fetch(url, c.req.raw.clone())
+    })
+    .get("/files/*", async c => {
         const path = c.req.path.slice(7)
         if (path.startsWith("books/") || path.startsWith("tests/") || path.startsWith("docs/")) {
             const id: DurableObjectId = c.env.COUNTER.idFromName("counter");
