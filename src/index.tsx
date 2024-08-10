@@ -92,10 +92,10 @@ export default new Hono<{ Bindings: Bindings }>()
         const data = await stub.list()
         return c.json(data)
     })
-    .all("/api/*", async c => {
-        const url = c.env.FILE_SERVER + (c.env.FILE_SERVER.endsWith("/") ? "" : "/") + "/api/" + c.req.path.slice(5)
-        return fetch(url, c.req.raw.clone())
-    })
+    // .all("/api/*", async c => {
+    //     const url = c.env.FILE_SERVER + (c.env.FILE_SERVER.endsWith("/") ? "" : "/") + "/api/" + c.req.path.slice(5)
+    //     return fetch(url, c.req.raw.clone())
+    // })
     .get("/files/*", async c => {
         const path = c.req.path.slice(7)
         if (path.startsWith("books/") || path.startsWith("tests/") || path.startsWith("docs/")) {
