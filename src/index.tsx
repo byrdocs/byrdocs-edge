@@ -9,6 +9,7 @@ import { buptSubnets } from '../bupt';
 
 import { Login } from './loginPage';
 import { login } from './login';
+import { Notification } from './notification';
 
 type Bindings = {
     COUNTER: DurableObjectNamespace<Counter<Bindings>>;
@@ -37,6 +38,9 @@ async function setCookie(c: Context) {
 
 export default new Hono<{ Bindings: Bindings }>()
     .get("/logo_512.png", page)
+    .all("*", async c => {
+        return c.render(<Notification message="由于技术原因，BYR Docs 暂停运营，预计近期恢复。" />)
+    })
     .get("/placeholder.svg", page)
     .get("/filesize.json", async c =>
         fetch(c.env.FILE_SERVER + (c.env.FILE_SERVER.endsWith("/") ? "" : "/") + "filesize.json")
@@ -92,10 +96,6 @@ export default new Hono<{ Bindings: Bindings }>()
         const data = await stub.list()
         return c.json(data)
     })
-    // .all("/api/*", async c => {
-    //     const url = c.env.FILE_SERVER + (c.env.FILE_SERVER.endsWith("/") ? "" : "/") + "/api/" + c.req.path.slice(5)
-    //     return fetch(url, c.req.raw.clone())
-    // })
     .get("/files/*", async c => {
         const path = c.req.path.slice(7)
         if (path.startsWith("books/") || path.startsWith("tests/") || path.startsWith("docs/")) {
