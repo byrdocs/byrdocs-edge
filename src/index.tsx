@@ -10,13 +10,16 @@ import { buptSubnets } from '../bupt';
 import { Login } from './loginPage';
 import { login } from './login';
 
+import { AwsClient } from 'aws4fetch'
+
 type Bindings = {
     COUNTER: DurableObjectNamespace<Counter<Bindings>>;
     JWT_SECRET: string;
     FILE_SERVER: string;
     TOKEN: string;
+    S3_GET_ACCESS_KEY_ID: string;
+    S3_GET_SECRET_ACCESS_KEY: string;
 }
-
 
 const ipChecker = createChecker(buptSubnets);
 
@@ -92,10 +95,6 @@ export default new Hono<{ Bindings: Bindings }>()
         const data = await stub.list()
         return c.json(data)
     })
-    // .all("/api/*", async c => {
-    //     const url = c.env.FILE_SERVER + (c.env.FILE_SERVER.endsWith("/") ? "" : "/") + "/api/" + c.req.path.slice(5)
-    //     return fetch(url, c.req.raw.clone())
-    // })
     .get("/files/*", async c => {
         const path = c.req.path.slice(7)
         if (path.startsWith("books/") || path.startsWith("tests/") || path.startsWith("docs/")) {
@@ -103,7 +102,11 @@ export default new Hono<{ Bindings: Bindings }>()
             const stub: DurableObjectStub<Counter<Bindings>> = c.env.COUNTER.get(id);
             c.executionCtx.waitUntil(stub.add(path))
         }
-        const url = c.env.FILE_SERVER + (c.env.FILE_SERVER.endsWith("/") ? "" : "/") + path
-        return fetch(url, c.req.raw.clone())
+        const aws = new AwsClient({
+            accessKeyId: c.env.S3_GET_ACCESS_KEY_ID,
+            secretAccessKey: c.env.S3_GET_SECRET_ACCESS_KEY,
+            service: "s3",
+        })
+        return aws.fetch("https://s3.byrdocs.org/byrdocs/" + path)
     })
     .use(page)
