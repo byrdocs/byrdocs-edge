@@ -54,6 +54,7 @@ export default new Hono<{ Bindings: Bindings }>()
         }))
     })
     .route("/api", apiRoute)
+    .get("/callback", page)
     .post("/login", async c => {
         const ip = c.req.header("CF-Connecting-IP") || "未知"
         if (ip !== "未知" && ipChecker(ip)) return c.redirect(c.req.query("to") || "/")
