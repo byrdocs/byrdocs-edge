@@ -55,8 +55,7 @@ export class OAuth extends DurableObject {
             }
         });
         if (!tokenRes.ok) {
-            console.log(tokenRes.status, await tokenRes.text());
-            throw new Error('登录失败，请重试');
+            throw new Error(await tokenRes.text());
         }
         const ghToken = await tokenRes.json() as {
             access_token?: string,
@@ -64,9 +63,9 @@ export class OAuth extends DurableObject {
         };
         if (!ghToken.access_token) {
             if (ghToken.error_description) {
-                throw new Error('登录失败，请重试（' + ghToken.error_description + '）');
+                throw new Error(ghToken.error_description);
             } else {
-                throw new Error('登录失败，请重试');
+                throw new Error('未知错误');
             }
         }
         const res = await fetch("https://api.github.com/user", {
@@ -77,8 +76,7 @@ export class OAuth extends DurableObject {
             }
         });
         if (!res.ok) {
-            console.log(res.status, await res.text());
-            throw new Error('登录失败，请重试');
+            throw new Error(await res.text());
         }
         const { id } = await res.json() as { login: string, id: number };
         const token = await sign({ id }, this.env.JWT_SECRET);
