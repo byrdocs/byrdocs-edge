@@ -49,7 +49,7 @@ export default new Hono<{ Bindings: Bindings }>()
         const origin = new URL(c.req.url).origin
         return c.redirect("https://github.com/login/oauth/authorize?" + new URLSearchParams({
             client_id: c.env.GITHUB_CLIENT_ID,
-            // redirect_uri: origin + "/callback",
+            redirect_uri: origin + "/callback",
             state: uuid,
         }))
     })

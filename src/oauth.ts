@@ -55,11 +55,19 @@ export class OAuth extends DurableObject {
             }
         });
         if (!tokenRes.ok) {
+            console.log(tokenRes.status, await tokenRes.text());
             throw new Error('登录失败，请重试');
         }
-        const ghToken = await tokenRes.json() as { access_token: string };
+        const ghToken = await tokenRes.json() as {
+            access_token?: string,
+            error_description?: string
+        };
         if (!ghToken.access_token) {
-            throw new Error('登录失败，请重试');
+            if (ghToken.error_description) {
+                throw new Error('登录失败，请重试（' + ghToken.error_description + '）');
+            } else {
+                throw new Error('登录失败，请重试');
+            }
         }
         const res = await fetch("https://api.github.com/user", {
             headers: {
