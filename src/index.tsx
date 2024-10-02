@@ -7,13 +7,14 @@ export { Counter } from './counter';
 import { createChecker } from 'is-in-subnet';
 import { buptSubnets } from '../bupt';
 
-import { Login } from './loginPage';
+import { Login } from './pages/login';
 import { login } from './login';
 
 import { AwsClient } from 'aws4fetch'
 import { Bindings } from './types';
 
 import apiRoute from './api';
+import s3Route from './s3';
 export { OAuth } from './oauth';
 
 const ipChecker = createChecker(buptSubnets);
@@ -49,6 +50,7 @@ export default new Hono<{ Bindings: Bindings }>()
         }))
     })
     .route("/api", apiRoute)
+    .route("/s3", s3Route)
     .post("/login", async c => {
         const ip = c.req.header("CF-Connecting-IP") || "未知"
         if (ip !== "未知" && ipChecker(ip)) return c.redirect(c.req.query("to") || "/")
@@ -97,6 +99,6 @@ export default new Hono<{ Bindings: Bindings }>()
             secretAccessKey: c.env.S3_GET_SECRET_ACCESS_KEY,
             service: "s3",
         })
-        return aws.fetch("https://s3.byrdocs.org/byrdocs/" + path)
+        return aws.fetch(`${c.env.S3_HOST}/${c.env.S3_BUCKET}/` + path)
     })
     .use(page)

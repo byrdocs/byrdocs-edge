@@ -1,6 +1,8 @@
 import { Hono } from 'hono'
 import { Bindings } from './types'
 import { OAuth } from './oauth';
+import { zValidator } from '@hono/zod-validator'
+import { z } from 'zod'
 
 export default new Hono<{
     Bindings: Bindings,
@@ -20,7 +22,7 @@ export default new Hono<{
         return c.json({
             tokenURL: origin + "/api/token/" + uuid,
             loginURL: origin + "/oauth/" + uuid,
-            code: 0
+            success: true
         })
     })
     .get("/token/:uuid", async c => {
@@ -28,24 +30,24 @@ export default new Hono<{
         try {
             const token = await c.get('oauth').listen(uuid)
             if (token) {
-                return c.json({ token, code: 0 })
+                return c.json({ token, success: true })
             } else {
-                return c.json({ error: "会话过期，请重新登录", code: 1 })
+                return c.json({ error: "会话过期，请重新登录", success: false })
             }
         } catch (e) {
-            return c.json({ error: (e as Error).message || e?.toString() || "未知错误", code: 1 })
+            return c.json({ error: (e as Error).message || e?.toString() || "未知错误", success: false })
         }
     })
-    .post("/callback", async c => {
-        const { code, state } = await c.req.json()
-        if (typeof code !== "string" || typeof state !== "string") {
-            return c.json({ error: "输入不合法", code: 1 })
-        }
+    .post("/callback", zValidator('json', z.object({
+        code: z.string(),
+        state: z.string(),
+    })), async c => {
+        const { code, state } = c.req.valid("json")
         try {
             const token = await c.get('oauth').login(code, state)
-            return c.json({ token, code: 0 })
+            return c.json({ token, success: true })
         } catch (e) {
-            return c.json({ error: (e as Error).message || e?.toString() || "未知错误", code: 1 })
+            return c.json({ error: (e as Error).message || e?.toString() || "未知错误", success: false })
         }
     })
 
