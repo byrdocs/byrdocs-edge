@@ -106,6 +106,8 @@ export default new Hono<{
         return c.json({
             success: true,
             key: key,
+            host: c.env.S3_HOST,
+            bucket: c.env.S3_BUCKET,
             tags: {
                 status: "temp",
                 uploader: c.get("id").toString(),
