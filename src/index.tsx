@@ -11,15 +11,10 @@ import { Login } from './loginPage';
 import { login } from './login';
 
 import { AwsClient } from 'aws4fetch'
+import { Bindings } from './types';
 
-type Bindings = {
-    COUNTER: DurableObjectNamespace<Counter<Bindings>>;
-    JWT_SECRET: string;
-    FILE_SERVER: string;
-    TOKEN: string;
-    S3_GET_ACCESS_KEY_ID: string;
-    S3_GET_SECRET_ACCESS_KEY: string;
-}
+import apiRoute from './api';
+export { OAuth } from './oauth';
 
 const ipChecker = createChecker(buptSubnets);
 
@@ -33,7 +28,7 @@ async function setCookie(c: Context) {
         maxAge: 2592000,
         secure: true,
         httpOnly: true,
-        sameSite: "Strict",
+        sameSite: "None",
         path: "/"
     })
 }
@@ -49,6 +44,16 @@ export default new Hono<{ Bindings: Bindings }>()
         if (ip !== "未知" && ipChecker(ip)) return c.redirect(c.req.query("to") || "/")
         return c.render(<Login ip={ip} />)
     })
+    .get("/oauth/:uuid", async c => {
+        const uuid = c.req.param("uuid")
+        const origin = new URL(c.req.url).origin
+        return c.redirect("https://github.com/login/oauth/authorize?" + new URLSearchParams({
+            client_id: c.env.GITHUB_CLIENT_ID,
+            // redirect_uri: origin + "/callback",
+            state: uuid,
+        }))
+    })
+    .route("/api", apiRoute)
     .post("/login", async c => {
         const ip = c.req.header("CF-Connecting-IP") || "未知"
         if (ip !== "未知" && ipChecker(ip)) return c.redirect(c.req.query("to") || "/")
