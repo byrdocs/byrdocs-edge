@@ -79,7 +79,10 @@ export class OAuth extends DurableObject {
             throw new Error(await res.text());
         }
         const { id } = await res.json() as { login: string, id: number };
-        const token = await sign({ id }, this.env.JWT_SECRET);
+        const token = await sign({
+            id,
+            iat: Math.floor(Date.now() / 1000),
+        }, this.env.JWT_SECRET);
         state.login = true;
         state.token = token;
         await this.ctx.storage.put(uuid, state);
