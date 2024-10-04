@@ -43,7 +43,7 @@ export default new Hono<{
             }>
         }
         if (body.EventName !== "s3:ObjectCreated:Put") {
-            return  c.json({ success: true })
+            return c.json({ success: true })
         }
         const prisma = new PrismaClient({ adapter: new PrismaD1(c.env.DB) })
         for (const record of body.Records) {
