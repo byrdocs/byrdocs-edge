@@ -17,7 +17,7 @@ export default new Hono<{
         await next()
     })
     .get("/notPublished", zValidator('query', z.object({
-        since: z.date().optional().default(new Date(0))
+        since: z.coerce.date().optional().default(new Date(0))
     })), async c => {
         const { since } = c.req.valid("query")
         const prisma = new PrismaClient({ adapter: new PrismaD1(c.env.DB) })

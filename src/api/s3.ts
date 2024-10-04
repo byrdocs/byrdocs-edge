@@ -192,6 +192,11 @@ export default new Hono<{
             }
         }
         try {
+            await prisma.file.deleteMany({
+                where: {
+                    fileName: key
+                }
+            })
             await prisma.file.create({
                 data: {
                     fileName: key,
