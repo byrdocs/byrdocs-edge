@@ -1,6 +1,6 @@
 import { Hono } from 'hono'
-import { Bindings } from './types'
-import { OAuth } from './oauth';
+import { Bindings } from '../types'
+import { OAuth } from '../objects/oauth';
 import { zValidator } from '@hono/zod-validator'
 import { z } from 'zod'
 
@@ -20,7 +20,7 @@ export default new Hono<{
         const uuid = await c.get('oauth').begin()
         const origin = new URL(c.req.url).origin
         return c.json({
-            tokenURL: origin + "/api/token/" + uuid,
+            tokenURL: origin + "/api/oauth/token/" + uuid,
             loginURL: origin + "/oauth/" + uuid,
             success: true
         })

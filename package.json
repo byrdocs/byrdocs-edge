@@ -11,10 +11,13 @@
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20240925.0",
     "@types/uuid": "^10.0.0",
+    "prisma": "^5.20.0",
     "typescript": "^5.0.4"
   },
   "dependencies": {
     "@hono/zod-validator": "^0.3.0",
+    "@prisma/adapter-d1": "^5.20.0",
+    "@prisma/client": "^5.20.0",
     "aws4fetch": "^1.0.20",
     "fast-xml-parser": "^4.5.0",
     "hono": "^4.6.3",

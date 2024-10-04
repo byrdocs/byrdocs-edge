@@ -1,8 +1,8 @@
 import { Hono, Context } from 'hono';
 import { getSignedCookie, setSignedCookie } from 'hono/cookie'
 
-import { Counter } from './counter';
-export { Counter } from './counter';
+import { Counter } from './objects/counter';
+export { Counter } from './objects/counter';
 
 import { createChecker } from 'is-in-subnet';
 import { buptSubnets } from '../bupt';
@@ -14,8 +14,7 @@ import { AwsClient } from 'aws4fetch'
 import { Bindings } from './types';
 
 import apiRoute from './api';
-import s3Route from './s3';
-export { OAuth } from './oauth';
+export { OAuth } from './objects/oauth';
 
 const ipChecker = createChecker(buptSubnets);
 
@@ -50,7 +49,6 @@ export default new Hono<{ Bindings: Bindings }>()
         }))
     })
     .route("/api", apiRoute)
-    .route("/s3", s3Route)
     .post("/login", async c => {
         const ip = c.req.header("CF-Connecting-IP") || "未知"
         if (ip !== "未知" && ipChecker(ip)) return c.redirect(c.req.query("to") || "/")
@@ -84,7 +82,7 @@ export default new Hono<{ Bindings: Bindings }>()
         if (isFile) {
             const token = c.req.header("X-Byrdocs-Token")
             const ip = c.req.header("CF-Connecting-IP")
-            if (!ip || !ipChecker(ip) || token !== c.env.TOKEN || await getSignedCookie(c, c.env.JWT_SECRET, "login") !== "1") {
+            if ((!ip || !ipChecker(ip)) && token !== c.env.TOKEN && await getSignedCookie(c, c.env.JWT_SECRET, "login") !== "1") {
                 const toq = new URL(c.req.url).searchParams
                 if ((c.req.path === "" || c.req.path === '/') && toq.size === 0) return c.redirect("/login")
                 const to = c.req.path + (toq.size > 0 ? "?" + toq.toString() : "")

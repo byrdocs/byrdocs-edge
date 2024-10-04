@@ -1,5 +1,5 @@
-import { Counter } from "./counter";
-import { OAuth } from "./oauth";
+import { Counter } from "./objects/counter";
+import { OAuth } from "./objects/oauth";
 
 export type Bindings = {
     COUNTER: DurableObjectNamespace<Counter<Bindings>>;
@@ -15,4 +15,5 @@ export type Bindings = {
     S3_ADMIN_SECRET_ACCESS_KEY: string;
     GITHUB_CLIENT_ID: string;
     GITHUB_CLIENT_SECRET: string;
+    DB: D1Database;
 }

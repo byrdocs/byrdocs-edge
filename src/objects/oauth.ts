@@ -2,7 +2,7 @@ import { DurableObject } from "cloudflare:workers";
 import { v4 as uuidv4 } from 'uuid';
 import { sign } from 'hono/jwt'
 
-import { Bindings } from "./types";
+import { Bindings } from "../types";
 
 type State = {
     login: boolean,
