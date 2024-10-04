@@ -14,6 +14,8 @@ import { AwsClient } from 'aws4fetch'
 import { Bindings } from './types';
 
 import apiRoute from './api';
+import { PrismaD1 } from '@prisma/adapter-d1';
+import { PrismaClient } from '@prisma/client';
 export { OAuth } from './objects/oauth';
 
 const ipChecker = createChecker(buptSubnets);
@@ -33,7 +35,7 @@ async function setCookie(c: Context) {
     })
 }
 
-export default new Hono<{ Bindings: Bindings }>()
+const app = new Hono<{ Bindings: Bindings }>()
     .get("/login", async c => {
         const ip = c.req.header("CF-Connecting-IP") || "未知"
         if (ip !== "未知" && ipChecker(ip)) return c.redirect(c.req.query("to") || "/")
@@ -100,3 +102,47 @@ export default new Hono<{ Bindings: Bindings }>()
         return aws.fetch(`${c.env.S3_HOST}/${c.env.S3_BUCKET}/` + path)
     })
     .use(page)
+
+export default {
+    fetch: app.fetch,
+    async scheduled(event: ScheduledEvent, env: Bindings, ctx: ExecutionContext) {
+        const s3 = new AwsClient({
+            accessKeyId: env.S3_ADMIN_ACCESS_KEY_ID,
+            secretAccessKey: env.S3_ADMIN_SECRET_ACCESS_KEY,
+            service: "s3",
+        })
+
+        const prisma = new PrismaClient({ adapter: new PrismaD1(env.DB) })
+        const files = await prisma.file.findMany({
+            where: {
+                OR: [
+                    {
+                        AND: [
+                            { status: { notIn: ['Uploaded', 'Published'] } },
+                            { createdAt: { lte: new Date(Date.now() - 3600 * 1000) } }
+                        ],
+                    },
+                    {
+                        AND: [
+                            { status: 'Uploaded' },
+                            { createdAt: { lte: new Date(Date.now() - 14 * 24 * 3600 * 1000) } }
+                        ],
+                    },
+                ],
+            },
+        });
+        for (const file of files) {
+            await s3.fetch(`${env.S3_HOST}/${env.S3_BUCKET}/${file.fileName}`, {
+                method: "DELETE"
+            })
+            await prisma.file.update({
+                where: {
+                    id: file.id
+                },
+                data: {
+                    status: file.status === "Uploaded" ? "Expired" : "Timeout"
+                }
+            })
+        }
+    }
+}

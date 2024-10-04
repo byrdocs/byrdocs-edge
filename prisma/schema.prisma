@@ -14,7 +14,7 @@ datasource db {
 model File {
   id            Int      @id @default(autoincrement())
   createdAt     DateTime @default(now())
-  fileName      String   @unique
+  fileName      String
   fileSize      Int?    // in bytes
   uploader      String  // GitHub ID (login)
   uploadTime    DateTime?

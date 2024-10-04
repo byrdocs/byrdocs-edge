@@ -50,7 +50,8 @@ export default new Hono<{
             if (record.s3.bucket.name !== c.env.S3_BUCKET) continue
             const file = await prisma.file.findFirst({
                 where: {
-                    fileName: record.s3.object.key
+                    fileName: record.s3.object.key,
+                    status: "Pending"
                 }
             })
             if (!file) continue
@@ -84,11 +85,11 @@ export default new Hono<{
                 },
                 data: {
                     status: "Uploaded",
+                    uploadTime: new Date(),
                     fileSize: record.s3.object.size
                 }
             })
         }
-        // console.log(body.EventName, body.Records.map(r => r.s3.object.key + "-" + r.s3.object.size + "-" + r.s3.object.eTag).join(", "))
         return c.json({ success: true })
     })
     .use(async (c, next) => {
@@ -190,14 +191,17 @@ export default new Hono<{
                 }
             }
         }
-
-        await prisma.file.create({
-            data: {
-                fileName: key,
-                uploader: c.get("id")!.toString(),
-                status: "Pending"
-            }
-        })
+        try {
+            await prisma.file.create({
+                data: {
+                    fileName: key,
+                    uploader: c.get("id")!.toString(),
+                    status: "Pending"
+                }
+            })
+        } catch (e) {
+            return c.json({ error: (e as Error).message || e?.toString() || "未知错误", success: false })
+        }
 
         return c.json({
             success: true,
