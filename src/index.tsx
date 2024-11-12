@@ -81,6 +81,7 @@ const app = new Hono<{ Bindings: Bindings }>()
     .get("/files/*", async c => {
         const path = c.req.path.slice(7)
         const isFile = !path.endsWith(".jpg") && !path.endsWith(".webp")
+        const filename = c.req.query("filename")
         if (isFile) {
             const token = c.req.header("X-Byrdocs-Token")
             const ip = c.req.header("CF-Connecting-IP")
@@ -99,7 +100,17 @@ const app = new Hono<{ Bindings: Bindings }>()
             secretAccessKey: c.env.S3_GET_SECRET_ACCESS_KEY,
             service: "s3",
         })
-        return aws.fetch(`${c.env.S3_HOST}/${c.env.S3_BUCKET}/` + path)
+        const url = `${c.env.S3_HOST}/${c.env.S3_BUCKET}/` + path
+        const res = await aws.fetch(url)
+        if (filename && res.status === 200) {
+            const headers = new Headers(res.headers)
+            headers.set("Content-Disposition", `attachment; filename*=UTF-8''${encodeURIComponent(filename)}`)
+            return new Response(res.body, {
+                ...res,
+                headers
+            })
+        }
+        return res
     })
     .use(page)
 
