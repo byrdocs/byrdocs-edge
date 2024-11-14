@@ -78,8 +78,8 @@ const app = new Hono<{ Bindings: Bindings }>()
         const data = await stub.list()
         return c.json(data)
     })
-    .get("/files/*", async c => {
-        const path = c.req.path.slice(7)
+    .get("/files/:path{.*?}", async c => {
+        const path = c.req.param("path")
         const isFile = !path.endsWith(".jpg") && !path.endsWith(".webp")
         const filename = c.req.query("filename")
         if (isFile) {

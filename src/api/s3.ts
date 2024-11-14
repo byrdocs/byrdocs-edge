@@ -109,6 +109,7 @@ export default new Hono<{
         }
         await next()
     })
+    .get("/files/:path{.*?}", async c => c.get("s3").fetch(`${c.env.S3_HOST}/${c.env.S3_BUCKET}/` + (c.req.param("path") ?? '')))
     .post("/upload", zValidator(
         'json',
         z.object({
