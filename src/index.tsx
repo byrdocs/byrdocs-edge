@@ -78,19 +78,39 @@ const app = new Hono<{ Bindings: Bindings }>()
         const data = await stub.list()
         return c.json(data)
     })
-    // .all("/api/*", async c => {
-    //     const url = c.env.FILE_SERVER + (c.env.FILE_SERVER.endsWith("/") ? "" : "/") + "/api/" + c.req.path.slice(5)
-    //     return fetch(url, c.req.raw.clone())
-    // })
-    .get("/files/*", async c => {
-        const path = c.req.path.slice(7)
-        if (path.startsWith("books/") || path.startsWith("tests/") || path.startsWith("docs/")) {
+    .get("/files/:path{.*?}", async c => {
+        const path = c.req.param("path")
+        const isFile = !path.endsWith(".jpg") && !path.endsWith(".webp")
+        const filename = c.req.query("filename")
+        if (isFile) {
+            const token = c.req.header("X-Byrdocs-Token")
+            const ip = c.req.header("CF-Connecting-IP")
+            if ((!ip || !ipChecker(ip)) && token !== c.env.TOKEN && await getSignedCookie(c, c.env.JWT_SECRET, "login") !== "1") {
+                const toq = new URL(c.req.url).searchParams
+                if ((c.req.path === "" || c.req.path === '/') && toq.size === 0) return c.redirect("/login")
+                const to = c.req.path + (toq.size > 0 ? "?" + toq.toString() : "")
+                return c.redirect("/login?" + new URLSearchParams({ to }).toString())
+            }
             const id: DurableObjectId = c.env.COUNTER.idFromName("counter");
             const stub: DurableObjectStub<Counter<Bindings>> = c.env.COUNTER.get(id);
             c.executionCtx.waitUntil(stub.add(path))
         }
-        const url = c.env.FILE_SERVER + (c.env.FILE_SERVER.endsWith("/") ? "" : "/") + path
-        return fetch(url, c.req.raw.clone())
+        const aws = new AwsClient({
+            accessKeyId: c.env.S3_GET_ACCESS_KEY_ID,
+            secretAccessKey: c.env.S3_GET_SECRET_ACCESS_KEY,
+            service: "s3",
+        })
+        const url = `${c.env.S3_HOST}/${c.env.S3_BUCKET}/` + path
+        const res = await aws.fetch(url)
+        if (filename && res.status === 200) {
+            const headers = new Headers(res.headers)
+            headers.set("Content-Disposition", `attachment; filename*=UTF-8''${encodeURIComponent(filename)}`)
+            return new Response(res.body, {
+                ...res,
+                headers
+            })
+        }
+        return res
     })
     .use(page)
 
