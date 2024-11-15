@@ -41,7 +41,7 @@ const app = new Hono<{ Bindings: Bindings }>()
         if (ip !== "未知" && ipChecker(ip)) return c.redirect(c.req.query("to") || "/")
         return c.render(<Login ip={ip} />)
     })
-    .get("/oauth/:uuid", async c => {
+    .get("/github/:uuid", async c => {
         const uuid = c.req.param("uuid")
         const origin = new URL(c.req.url).origin
         return c.redirect("https://github.com/login/oauth/authorize?" + new URLSearchParams({

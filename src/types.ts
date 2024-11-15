@@ -5,7 +5,6 @@ export type Bindings = {
     COUNTER: DurableObjectNamespace<Counter<Bindings>>;
     OAUTH: DurableObjectNamespace<OAuth>;
     JWT_SECRET: string;
-    FILE_SERVER: string;
     TOKEN: string;
     S3_HOST: string;
     S3_BUCKET: string;

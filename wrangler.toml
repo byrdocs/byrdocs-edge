@@ -1,5 +1,5 @@
 #:schema node_modules/wrangler/config-schema.json
-name = "byrdocs-edge-v2"
+name = "byrdocs-edge"
 main = "src/index.tsx"
 compatibility_date = "2024-04-23"
 
@@ -14,6 +14,12 @@ new_classes = ["Counter"]
 [[durable_objects.bindings]]
 name = "OAUTH"
 class_name = "OAuth"
+
+
+[[migrations]]
+tag = "v1"
+new_classes = ["OAuth"]
+
 
 [observability]
 enabled = true
