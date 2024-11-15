@@ -5,7 +5,7 @@ const Layout: FC = ({ current, children }: PropsWithChildren<{ current?: string 
     return (
         <html lang='zh-CN'>
             <head>
-                <title>BYR Docs</title>
+                <title>BYR Docs 登录</title>
                 <meta charset="UTF-8" />
                 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
                 <script src="https://cdn.tailwindcss.com"></script>
@@ -84,10 +84,10 @@ export const Login: FC<{ errorMsg?: string, ip: string }> = ({ errorMsg, ip }) =
                                 <path strokeLinecap="round" strokeLinejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Zm-9 5.25h.008v.008H12v-.008Z" />
                             </svg>
                             ，我们无法确定您的身份，请您考虑使用
-                            <button target="_blank"
+                            <a target="_blank"
                                 className={"text-blue-500 hover:underline dark:text-blue-400 dark:hover:text-blue-300 login"}>
                                 北邮统一认证
-                            </button>
+                            </a>
                             账号登录。
                         </P>
                         {errorMsg && <p className="text-sm text-red-500 dark:text-red-400">{errorMsg}</p>}
@@ -97,17 +97,17 @@ export const Login: FC<{ errorMsg?: string, ip: string }> = ({ errorMsg, ip }) =
                             <div className="space-y-2">
                                 <label
                                     className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                                    for="student-id">
+                                    htmlFor="student-id">
                                     学号
                                 </label>
                                 <input
                                     className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 dark:border-gray-600 dark:bg-gray-700 dark:placeholder:text-gray-500"
-                                    id="studentId" type="text" name="studentId" minlength={10} maxlength={10} required pattern="20\d{8}" />
+                                    id="studentId" type="text" name="studentId" minLength={10} maxLength={10} required pattern="20\d{8}" />
                             </div>
                             <div className="space-y-2">
                                 <label
                                     className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                                    for="password">
+                                    htmlFor="password">
                                     密码
                                 </label>
                                 <input
@@ -125,12 +125,12 @@ export const Login: FC<{ errorMsg?: string, ip: string }> = ({ errorMsg, ip }) =
                     </form>
                     <div className="flex flex-col px-6 pt-0 space-y-1">
                         <P className='space-x-2 text-xs'>
-                            <button target="_blank" id="loginExplaination"
+                            <button id="loginExplaination"
                                 className={"text-blue-500 hover:underline dark:text-blue-400 dark:hover:text-blue-300 "}>
                                 此登录是如何工作的?
                             </button>
                             <span>|</span>
-                            <button target="_blank" id="loginExplaination"
+                            <button id="loginExplaination"
                                 className={"text-blue-500 hover:underline dark:text-blue-400 dark:hover:text-blue-300 explaination "}>
                                 关于网络环境
                             </button>
