@@ -16,7 +16,7 @@ model File {
   createdAt     DateTime @default(now())
   fileName      String
   fileSize      Int?    // in bytes
-  uploader      String  // GitHub ID (login)
+  uploader      String
   uploadTime    DateTime?
   status        String  // 'Pending', 'Timeout', 'Expired', 'Error', 'Uploaded', 'Published'
   errorMessage  String? // When status is 'Error'

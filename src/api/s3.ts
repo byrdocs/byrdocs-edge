@@ -54,7 +54,12 @@ export default new Hono<{
                     status: "Pending"
                 }
             })
-            if (!file) continue
+            if (!file) {
+                await c.get("s3").fetch(`${c.env.S3_HOST}/${c.env.S3_BUCKET}/${record.s3.object.key}`, {
+                    method: "DELETE"
+                })
+                continue
+            }
 
             async function setError(reason: string) {
                 await prisma.file.update({
