@@ -15,12 +15,6 @@ new_classes = ["Counter"]
 name = "OAUTH"
 class_name = "OAuth"
 
-
-[[migrations]]
-tag = "v1"
-new_classes = ["OAuth"]
-
-
 [observability]
 enabled = true
 

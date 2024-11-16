@@ -1,6 +1,7 @@
 import { DurableObject } from "cloudflare:workers";
 import { v4 as uuidv4 } from 'uuid';
 import { sign } from 'hono/jwt'
+import { login } from "../login";
 
 import { Bindings } from "../types";
 
@@ -80,7 +81,27 @@ export class OAuth extends DurableObject {
         }
         const { id } = await res.json() as { login: string, id: number };
         const token = await sign({
-            id,
+            id: `GitHub-${id}`,
+            download: false,
+            iat: Math.floor(Date.now() / 1000),
+        }, this.env.JWT_SECRET);
+        state.login = true;
+        state.token = token;
+        await this.ctx.storage.put(uuid, state);
+        const listeners = this.listeners.get(uuid) || [];
+        this.listeners.delete(uuid);
+        listeners.forEach(listener => listener(token));
+        return token;
+    }
+
+    async loginBUPT(username: string, uuid: string) {
+        const state = await this.ctx.storage.get<State>(uuid);
+        if (!state) {
+            throw new Error('您的会话已过期，请重新登录');
+        }
+        const token = await sign({
+            id: `BUPT-${username}`,
+            download: true,
             iat: Math.floor(Date.now() / 1000),
         }, this.env.JWT_SECRET);
         state.login = true;

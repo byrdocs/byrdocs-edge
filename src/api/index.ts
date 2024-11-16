@@ -7,7 +7,7 @@ import fileRoutes from './file'
 export default new Hono<{
     Bindings: Bindings
 }>()
-    .route('/oauth', oauthRoutes)
+    .route('/auth', oauthRoutes)
     .route('/s3', s3Routes)
     .route('/file', fileRoutes)
     .all("*", async c => {

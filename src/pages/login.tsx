@@ -74,8 +74,8 @@ function P({ children, className }: PropsWithChildren<{ className?: string }>) {
 export const Login: FC<{ errorMsg?: string, ip: string }> = ({ errorMsg, ip }) => {
     return (
         <Layout current={'login'}>
-            <div className="min-h-[100vh] flex flex-col dark:bg-black">
-                <div className={"md:rounded-lg border bg-card text-card-foreground shadow-sm w-full md:w-[500px] m-auto p-4 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 "} id="loginCard">
+            <div className="min-h-[100vh] flex flex-col dark:bg-black pt-12">
+                <div className={"sm:rounded-lg border bg-card text-card-foreground shadow-sm w-full sm:w-[500px] m-auto p-4 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 "} id="loginCard">
                     <div className="flex flex-col p-6 pb-2 space-y-1">
                         <h3 className="whitespace-nowrap font-semibold tracking-tight text-2xl dark:text-white">登录 BYR Docs</h3>
                         <P className='pt-2'>
@@ -137,7 +137,7 @@ export const Login: FC<{ errorMsg?: string, ip: string }> = ({ errorMsg, ip }) =
                         </P>
                     </div>
                 </div>
-                <div className="md:rounded-lg border bg-card text-card-foreground shadow-sm w-full md:w-[500px] m-auto p-4 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 hidden" id="explainCard">
+                <div className="sm:rounded-lg border bg-card text-card-foreground shadow-sm w-full sm:w-[500px] m-auto p-4 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 hidden" id="explainCard">
                     <div className="flex flex-col p-6 pb-0 space-y-1">
                         <h3 className="whitespace-nowrap font-semibold tracking-tight text-2xl dark:text-white mb-4">
                             关于网络环境
@@ -192,7 +192,7 @@ export const Login: FC<{ errorMsg?: string, ip: string }> = ({ errorMsg, ip }) =
                         </button>
                     </div>
                 </div>
-                <div className="md:rounded-lg border bg-card text-card-foreground shadow-sm w-full md:w-[500px] m-auto p-4 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 hidden" id="loginExplainCard">
+                <div className="sm:rounded-lg border bg-card text-card-foreground shadow-sm w-full sm:w-[500px] m-auto p-4 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 hidden" id="loginExplainCard">
                     <div className="flex flex-col p-6 pb-0 space-y-1">
                         <h3 className="whitespace-nowrap font-semibold tracking-tight text-2xl dark:text-white mb-4">
                             此登录是如何工作的？
@@ -221,7 +221,7 @@ export const Login: FC<{ errorMsg?: string, ip: string }> = ({ errorMsg, ip }) =
                             <Link to="https://github.com/byrdocs/byrdocs-edge/blob/main/src/login.ts" className='mx-1'>
                                 GitHub
                             </Link>
-                            页面查看详细的实现方法。
+                        查看详细的实现方法。
                         </P>
                     </div>
                     <div className="flex items-center p-6">
@@ -232,7 +232,7 @@ export const Login: FC<{ errorMsg?: string, ip: string }> = ({ errorMsg, ip }) =
                         </button>
                     </div>
                 </div>
-                <footer className="h-12 text-center text-xs sm:text-sm flex text-gray-500 dark:text-gray-400 px-4">
+                <footer className="h-12 text-center text-xs sm:text-sm flex text-gray-500 dark:text-gray-400 px-4 mt-12">
                     <p className="m-auto text-xs px-5 group">
                         <Link to="mailto:contact@byrdocs.org" className=''>
                             联系我们
