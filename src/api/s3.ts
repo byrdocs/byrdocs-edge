@@ -13,6 +13,7 @@ export default new Hono<{
     Variables: {
         id?: string,
         s3: AwsClient,
+        canDownload: boolean
     }
 }>()
     .use(async (c, next) => {
@@ -109,12 +110,18 @@ export default new Hono<{
                 return c.json({ error: "Token 无效", success: false })
             }
             c.set("id", payload.id)
+            c.set("canDownload", payload.download === true)
         } catch (e) {
             return c.json({ error: "Token 无效", success: false })
         }
         await next()
     })
-    .get("/files/:path{.*?}", async c => c.get("s3").fetch(`${c.env.S3_HOST}/${c.env.S3_BUCKET}/` + (c.req.param("path") ?? '')))
+    .get("/files/:path{.*?}", async c => {
+        if (!c.get("canDownload")) {
+            return c.json({ error: "无权访问", success: false }, { status: 403 })
+        }
+        return c.get("s3").fetch(`${c.env.S3_HOST}/${c.env.S3_BUCKET}/` + (c.req.param("path") ?? ''))
+    })
     .post("/upload", zValidator(
         'json',
         z.object({
