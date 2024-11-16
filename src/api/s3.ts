@@ -11,7 +11,7 @@ import { PrismaD1 } from '@prisma/adapter-d1'
 export default new Hono<{
     Bindings: Bindings,
     Variables: {
-        id?: number,
+        id?: string,
         s3: AwsClient,
     }
 }>()
@@ -100,7 +100,7 @@ export default new Hono<{
         }
         try {
             const payload = await verify(token, c.env.JWT_SECRET)
-            if (typeof payload.id !== "number") {
+            if (typeof payload.id !== "string") {
                 return c.json({ error: "Token 无效", success: false })
             }
             c.set("id", payload.id)
