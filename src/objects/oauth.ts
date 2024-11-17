@@ -6,7 +6,9 @@ import { login } from "../login";
 import { Bindings } from "../types";
 
 type State = {
+    service: string,
     login: boolean,
+    data?: string,
     createdAt: number,
     token?: string,
 }
@@ -31,13 +33,23 @@ export class OAuth extends DurableObject {
         this.ctx.storage.setAlarm(Date.now() + 3600 * 1000);
     }
 
-    async begin() {
+    async begin(service: string, data?: string) {
         const uuid = uuidv4();
         this.ctx.storage.put<State>(uuid, {
             login: false,
+            service,
+            data,
             createdAt: Date.now(),
         });
         return uuid;
+    }
+
+    async get(uuid: string) {
+        const state = await this.ctx.storage.get<State>(uuid);
+        if (!state) {
+            throw new Error('您的会话已过期，请重新登录');
+        }
+        return state;
     }
 
     async login(code: string, uuid: string) {
@@ -100,7 +112,11 @@ export class OAuth extends DurableObject {
         const listeners = this.listeners.get(uuid) || [];
         this.listeners.delete(uuid);
         listeners.forEach(listener => listener(token));
-        return token;
+        return {
+            token,
+            service: state.service,
+            data: state.data
+        }
     }
 
     async loginBUPT(username: string, uuid: string) {
@@ -118,7 +134,11 @@ export class OAuth extends DurableObject {
         const listeners = this.listeners.get(uuid) || [];
         this.listeners.delete(uuid);
         listeners.forEach(listener => listener(token));
-        return token;
+        return {
+            token,
+            service: state.service,
+            data: state.data
+        }
     }
 
     async listen(uuid: string) {

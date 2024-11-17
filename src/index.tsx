@@ -25,7 +25,7 @@ async function page(c: Context) {
     return fetch("https://byrdocs-frontend.pages.dev" + c.req.url.slice(url.origin.length))
 }
 
-async function setCookie(c: Context) {
+export async function setCookie(c: Context) {
     await setSignedCookie(c, "login", Date.now().toString(), c.env.JWT_SECRET, {
         maxAge: 2592000,
         secure: true,
@@ -39,16 +39,6 @@ const app = new Hono<{ Bindings: Bindings }>()
         const ip = c.req.header("CF-Connecting-IP") || "未知"
         if (ip !== "未知" && ipChecker(ip)) return c.redirect(c.req.query("to") || "/")
         return c.render(<Login ip={ip} />)
-    })
-    .get("/github/:uuid", async c => {
-        const uuid = c.req.param("uuid")
-        const origin = new URL(c.req.url).origin
-        return c.redirect("https://github.com/login/oauth/authorize?" + new URLSearchParams({
-            client_id: c.env.GITHUB_CLIENT_ID,
-            redirect_uri: origin + "/callback",
-            state: uuid,
-            scope: "read:org"
-        }))
     })
     .route("/api", apiRoute)
     .post("/login", async c => {

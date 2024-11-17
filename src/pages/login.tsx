@@ -24,7 +24,17 @@ const Layout: FC = ({ current, children }: PropsWithChildren<{ current?: string 
                 {children}
                 {html`
                     <script>
-                        let current = "${current}", stack = [], init_cookie = document.cookie;
+                        function getCookie() {
+                            let cookie = document.cookie.split(';').map(e => e.trim()).find(e => e.startsWith('login='))
+                            if (cookie) {
+                                return cookie.split('=')[1]
+                            }
+                            return null
+                        }
+                        let current = "${current}", stack = [], clickedLogin = false, init_cookie = getCookie();
+                        document.getElementById('login').addEventListener('click', () => {
+                            clickedLogin = true
+                        })
                         function go(card) {
                             document.getElementById(current + 'Card').classList.add('hidden')
                             document.getElementById(card + 'Card').classList.remove('hidden')
@@ -33,12 +43,33 @@ const Layout: FC = ({ current, children }: PropsWithChildren<{ current?: string 
                             if (current === 'login')
                                 document.getElementById('studentId').focus()
                         }
+                        const to = new URL(location.href)?.searchParams?.get("to");
+                        if (to) {
+                            if (window.self !== window.top) {
+                                document.getElementById("otherLogin").target = "_blank"
+                            } else {
+                                document.getElementById("otherLogin").href = "/api/auth/login?" + new URLSearchParams({ to }).toString();
+                            }
+                            document.getElementById("loginForm").action = "/login?" + new URLSearchParams({ to }).toString();
+                        }
                         let tid = setInterval(() => {
-                            if (document.cookie !== init_cookie) {
-                                if (new URL(location.href)?.searchParams?.get("to")?.startsWith("/files/")) {
+                            let cookie = getCookie()
+                            if (cookie && getCookie() !== init_cookie) {
+                                if (clickedLogin && to?.startsWith("/files/")) {
                                     document.getElementById('success_info').innerHTML = "文件即将开始下载..."
+                                    document.getElementById('continue_block').classList.add('hidden')
+                                    document.getElementById('success_block').classList.remove('pb-0')
+                                    go('success')
+                                } else {
+                                    document.getElementById('success_info').innerHTML = "您已在其他标签页成功登录 BYR Docs。"
+                                    document.getElementById('continue').addEventListener('click', (e) => {
+                                        e.preventDefault()
+                                        location.href = new URL(location.href).searchParams.get("to") || "/"
+                                    })
+                                    setTimeout(() => {
+                                        go('success')
+                                    }, 500)
                                 }
-                                go('success')
                                 clearInterval(tid)
                             }
                         }, 100)
@@ -57,11 +88,6 @@ const Layout: FC = ({ current, children }: PropsWithChildren<{ current?: string 
                         document.getElementById("loginExplaination").addEventListener("click", (e) => {
                             go('loginExplain')
                         })
-                        const q = new URLSearchParams(window.location.search);
-                        const to = q.get("to");
-                        if (to) {
-                            document.getElementById("loginForm").action = "/login?" + new URLSearchParams({ to }).toString();
-                        }
                     </script>
                 `}
             </body>
@@ -69,9 +95,9 @@ const Layout: FC = ({ current, children }: PropsWithChildren<{ current?: string 
     )
 }
 
-function Link({ to, children, className, internal }: PropsWithChildren<{ to: string, className?: string, internal?: boolean }>) {
+function Link({ to, children, className, internal, id }: PropsWithChildren<{ id?: string, to: string, className?: string, internal?: boolean }>) {
     return (
-        <a href={to} target={ internal ? "_self" : "_blank" }
+        <a href={to} target={ internal ? "_self" : "_blank" } id={id}
             className={"text-blue-500 hover:underline dark:text-blue-400 dark:hover:text-blue-300 " + (className || '')}>{children}</a>
     )
 }
@@ -143,6 +169,8 @@ export const Login: FC<{ errorMsg?: string, ip: string }> = ({ errorMsg, ip }) =
                                 className={"text-blue-500 hover:underline dark:text-blue-400 dark:hover:text-blue-300 explaination "}>
                                 关于网络环境
                             </button>
+                            <span>|</span>
+                            <Link to={"/api/auth/login"} id="otherLogin" internal={true}>其他登录方式</Link>
                         </P>
                     </div>
                 </div>
@@ -242,13 +270,19 @@ export const Login: FC<{ errorMsg?: string, ip: string }> = ({ errorMsg, ip }) =
                     </div>
                 </div>
                 <div className="sm:rounded-lg border bg-card text-card-foreground shadow-sm w-full sm:w-[500px] m-auto p-4 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 hidden" id="successCard">
-                    <div className="flex flex-col p-6 space-y-1">
+                    <div className="flex flex-col p-6 space-y-1 pb-0" id="success_block">
                         <h3 className="whitespace-nowrap font-semibold tracking-tight text-2xl dark:text-white mb-4">
                             登录成功
                         </h3>
-                        <P id="success_info">
-                            <Link to="/" internal={true}>前往主页</Link>
-                        </P>
+                        <P id="success_info"></P>
+                    </div>
+                    <div className="flex items-center p-6" id="continue_block">
+                        <button
+                            className="inline-flex items-center justify-center whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-black text-white hover:bg-black/80 h-10 px-4 py-2 w-full dark:bg-gray-900 dark:hover:bg-gray-700"
+                            id="continue"
+                        >
+                            继续
+                        </button>
                     </div>
                 </div>
                 <footer className="h-12 text-center text-xs sm:text-sm flex text-gray-500 dark:text-gray-400 px-4 mt-12">
