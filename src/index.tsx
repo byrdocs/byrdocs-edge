@@ -86,7 +86,11 @@ const app = new Hono<{ Bindings: Bindings }>()
             const token = c.req.header("X-Byrdocs-Token")
             const ip = c.req.header("CF-Connecting-IP")
             const cookie = await getSignedCookie(c, c.env.JWT_SECRET, "login")
-            if ((!ip || !ipChecker(ip)) && token !== c.env.TOKEN && !cookie) {
+            if (
+                (!ip || !ipChecker(ip)) &&
+                token !== c.env.TOKEN &&
+                (!cookie || isNaN(parseInt(cookie)) || Date.now() - parseInt(cookie) > 2592000 * 1000)
+            ) {
                 const toq = new URL(c.req.url).searchParams
                 if ((c.req.path === "" || c.req.path === '/') && toq.size === 0) return c.redirect("/login")
                 const to = c.req.path + (toq.size > 0 ? "?" + toq.toString() : "")
