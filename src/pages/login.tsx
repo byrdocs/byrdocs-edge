@@ -24,7 +24,7 @@ const Layout: FC = ({ current, children }: PropsWithChildren<{ current?: string 
                 {children}
                 {html`
                     <script>
-                        let current = "${current}", stack = [];
+                        let current = "${current}", stack = [], init_cookie = document.cookie;
                         function go(card) {
                             document.getElementById(current + 'Card').classList.add('hidden')
                             document.getElementById(card + 'Card').classList.remove('hidden')
@@ -33,6 +33,15 @@ const Layout: FC = ({ current, children }: PropsWithChildren<{ current?: string 
                             if (current === 'login')
                                 document.getElementById('studentId').focus()
                         }
+                        let tid = setInterval(() => {
+                            if (document.cookie !== init_cookie) {
+                                if (new URL(location.href)?.searchParams?.get("to")?.startsWith("/files/")) {
+                                    document.getElementById('success_info').innerHTML = "文件即将开始下载..."
+                                }
+                                go('success')
+                                clearInterval(tid)
+                            }
+                        }, 100)
                         for (const e of document.getElementsByClassName("explaination"))
                             e.addEventListener("click", (e) => {
                                 go('explain')
@@ -60,15 +69,15 @@ const Layout: FC = ({ current, children }: PropsWithChildren<{ current?: string 
     )
 }
 
-function Link({ to, children, className }: PropsWithChildren<{ to: string, className?: string }>) {
+function Link({ to, children, className, internal }: PropsWithChildren<{ to: string, className?: string, internal?: boolean }>) {
     return (
-        <a href={to} target="_blank"
+        <a href={to} target={ internal ? "_self" : "_blank" }
             className={"text-blue-500 hover:underline dark:text-blue-400 dark:hover:text-blue-300 " + (className || '')}>{children}</a>
     )
 }
 
-function P({ children, className }: PropsWithChildren<{ className?: string }>) {
-    return <p className={"text-sm  dark:text-gray-400 " + (className || '')}>{children}</p>
+function P({ children, className, id }: PropsWithChildren<{ className?: string, id?: string }>) {
+    return <p id={id} className={"text-sm  dark:text-gray-400 " + (className || '')}>{children}</p>
 }
 
 export const Login: FC<{ errorMsg?: string, ip: string }> = ({ errorMsg, ip }) => {
@@ -208,7 +217,7 @@ export const Login: FC<{ errorMsg?: string, ip: string }> = ({ errorMsg, ip }) =
                         <P>我们的系统<b>不会存储</b>您的用户名和密码。</P>
                         <P><b>2. 数据处理与安全</b></P>
                         <P>我们严格遵守数据保护原则，<b>不</b>收集或存储任何敏感信息，如您的姓名等个人信息。</P>
-                        <P>您成功登录后，我们只会在您的设备上存储一个名为 <code>login</code> 、值为 <code>1</code> 的 Cookie。该 Cookie 不包含任何可以识别您身份的信息。</P>
+                        <P>您成功登录后，我们只会在您的设备上存储一个名为 <code>login</code> 、值为登录时时间戳的 Cookie。该 Cookie 不包含任何可以识别您身份的信息。</P>
                         <P><b>3. Cookie 的使用</b></P>
                         <P>该 Cookie 仅用于识别用户是否已经成功登录，帮助我们提供更流畅的用户体验，并维持登录状态。</P>
                         <P>该 Cookie 不会被用来追踪您的个人浏览活动或用于任何其他目的。</P>
@@ -230,6 +239,16 @@ export const Login: FC<{ errorMsg?: string, ip: string }> = ({ errorMsg, ip }) =
                             type="submit">
                             返回
                         </button>
+                    </div>
+                </div>
+                <div className="sm:rounded-lg border bg-card text-card-foreground shadow-sm w-full sm:w-[500px] m-auto p-4 dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 hidden" id="successCard">
+                    <div className="flex flex-col p-6 space-y-1">
+                        <h3 className="whitespace-nowrap font-semibold tracking-tight text-2xl dark:text-white mb-4">
+                            登录成功
+                        </h3>
+                        <P id="success_info">
+                            <Link to="/" internal={true}>前往主页</Link>
+                        </P>
                     </div>
                 </div>
                 <footer className="h-12 text-center text-xs sm:text-sm flex text-gray-500 dark:text-gray-400 px-4 mt-12">

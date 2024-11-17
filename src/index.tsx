@@ -26,10 +26,9 @@ async function page(c: Context) {
 }
 
 async function setCookie(c: Context) {
-    await setSignedCookie(c, "login", "1", c.env.JWT_SECRET, {
+    await setSignedCookie(c, "login", Date.now().toString(), c.env.JWT_SECRET, {
         maxAge: 2592000,
         secure: true,
-        httpOnly: true,
         sameSite: "None",
         path: "/"
     })
@@ -85,7 +84,8 @@ const app = new Hono<{ Bindings: Bindings }>()
         if (isFile) {
             const token = c.req.header("X-Byrdocs-Token")
             const ip = c.req.header("CF-Connecting-IP")
-            if ((!ip || !ipChecker(ip)) && token !== c.env.TOKEN && await getSignedCookie(c, c.env.JWT_SECRET, "login") !== "1") {
+            const cookie = await getSignedCookie(c, c.env.JWT_SECRET, "login")
+            if ((!ip || !ipChecker(ip)) && token !== c.env.TOKEN && !cookie) {
                 const toq = new URL(c.req.url).searchParams
                 if ((c.req.path === "" || c.req.path === '/') && toq.size === 0) return c.redirect("/login")
                 const to = c.req.path + (toq.size > 0 ? "?" + toq.toString() : "")
