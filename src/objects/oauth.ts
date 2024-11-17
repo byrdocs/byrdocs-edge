@@ -79,10 +79,19 @@ export class OAuth extends DurableObject {
         if (!res.ok) {
             throw new Error(await res.text());
         }
-        const { id } = await res.json() as { login: string, id: number };
+        const { id, login } = await res.json() as { login: string, id: number };
+        const orgRes = await fetch(`https://api.github.com/orgs/byrdocs/members/${login}`, {
+            headers: {
+                Authorization: `Bearer ${ghToken.access_token}`,
+                Accept: "application/json",
+                "User-Agent": "ByrDocs"
+            }
+        })
+        if (orgRes.status !== 204) {
+            throw new Error('您不是 byrdocs 组织的成员');
+        }
         const token = await sign({
             id: `GitHub-${id}`,
-            download: false,
             iat: Math.floor(Date.now() / 1000),
         }, this.env.JWT_SECRET);
         state.login = true;
@@ -101,7 +110,6 @@ export class OAuth extends DurableObject {
         }
         const token = await sign({
             id: `BUPT-${username}`,
-            download: true,
             iat: Math.floor(Date.now() / 1000),
         }, this.env.JWT_SECRET);
         state.login = true;

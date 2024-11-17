@@ -47,6 +47,7 @@ const app = new Hono<{ Bindings: Bindings }>()
             client_id: c.env.GITHUB_CLIENT_ID,
             redirect_uri: origin + "/callback",
             state: uuid,
+            scope: "read:org"
         }))
     })
     .route("/api", apiRoute)
