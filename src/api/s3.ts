@@ -55,7 +55,12 @@ export default new Hono<{
                     status: "Pending"
                 }
             })
-            if (!file) {
+            const count = await prisma.file.count({
+                where: {
+                    fileName: record.s3.object.key
+                }
+            })
+            if (count != 0 && !file) {
                 await c.get("s3").fetch(`${c.env.S3_HOST}/${c.env.S3_BUCKET}/${record.s3.object.key}`, {
                     method: "DELETE"
                 })

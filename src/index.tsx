@@ -100,8 +100,11 @@ const app = new Hono<{ Bindings: Bindings }>()
             secretAccessKey: c.env.S3_GET_SECRET_ACCESS_KEY,
             service: "s3",
         })
-        const url = `${c.env.S3_HOST}/${c.env.S3_BUCKET}/` + path
-        const res = await aws.fetch(url)
+        const res = await fetch(await aws.sign(`${c.env.S3_HOST}/${c.env.S3_BUCKET}/` + path, {
+            headers: {
+                range: c.req.header("Range") || ""
+            }
+        }))
         if (filename && res.status === 200) {
             const headers = new Headers(res.headers)
             headers.set("Content-Disposition", `attachment; filename*=UTF-8''${encodeURIComponent(filename)}`)
