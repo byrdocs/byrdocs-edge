@@ -58,6 +58,7 @@ const app = new Hono<{ Bindings: Bindings }>()
             return c.render(<Login errorMsg={(e as Error).message || e?.toString() || "未知错误"} ip={ip} />)
         }
     })
+    .get("/schema/:path{.*?}", c => fetch("https://files.byrdocs.org/" + c.req.param("path")))
     .get("/rank", async c => {
         const token = c.req.query("token")
         if (token !== c.env.TOKEN) {
