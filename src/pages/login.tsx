@@ -31,9 +31,9 @@ const Layout: FC = ({ current, children }: PropsWithChildren<{ current?: string 
                             }
                             return null
                         }
-                        let current = "${current}", stack = [], clickedLogin = false, init_cookie = getCookie();
-                        document.getElementById('login').addEventListener('click', () => {
-                            clickedLogin = true
+                        let current = "${current}", stack = [], submitted = false, init_cookie = getCookie();
+                        document.getElementById('loginForm').addEventListener('submit', () => {
+                            submitted = true
                         })
                         function go(card) {
                             document.getElementById(current + 'Card').classList.add('hidden')
@@ -55,11 +55,13 @@ const Layout: FC = ({ current, children }: PropsWithChildren<{ current?: string 
                         let tid = setInterval(() => {
                             let cookie = getCookie()
                             if (cookie && getCookie() !== init_cookie) {
-                                if (clickedLogin && to?.startsWith("/files/")) {
-                                    document.getElementById('success_info').innerHTML = "文件即将开始下载..."
-                                    document.getElementById('continue_block').classList.add('hidden')
-                                    document.getElementById('success_block').classList.remove('pb-0')
-                                    go('success')
+                                if (submitted) {
+									if (to?.startsWith("/files/")) {
+										document.getElementById('success_info').innerHTML = "文件即将开始下载..."
+										document.getElementById('continue_block').classList.add('hidden')
+										document.getElementById('success_block').classList.remove('pb-0')
+										go('success')
+									}
                                 } else {
                                     document.getElementById('success_info').innerHTML = "您已在其他标签页成功登录 BYR Docs。"
                                     document.getElementById('continue').addEventListener('click', (e) => {
