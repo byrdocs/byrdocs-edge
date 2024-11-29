@@ -43,6 +43,7 @@ export default new Hono<{
                 }
             }>
         }
+        console.log("BODY:" + JSON.stringify(body))
         if (body.EventName !== "s3:ObjectCreated:Put") {
             return c.json({ success: true })
         }
@@ -61,6 +62,7 @@ export default new Hono<{
                 }
             })
             if (count != 0 && !file) {
+                console.log("WARN: 未找到相关上传记录, 删除文件", record.s3.object.key)
                 await c.get("s3").fetch(`${c.env.S3_HOST}/${c.env.S3_BUCKET}/${record.s3.object.key}`, {
                     method: "DELETE"
                 })
@@ -90,6 +92,23 @@ export default new Hono<{
                 await setError("文件内容 md5 和文件名不匹配")
                 continue
             }
+
+            await c.get("s3").fetch(`${c.env.S3_HOST}/${c.env.S3_BUCKET}/${record.s3.object.key}?tagging`, {
+                method: "PUT",
+                body: `<?xml version="1.0" encoding="UTF-8"?>
+<Tagging xmlns="http://s3.amazonaws.com/doc/2006-03-01/">
+   <TagSet>
+        <Tag>
+            <Key>status</Key>
+            <Value>temp</Value>
+        </Tag>
+        <Tag>
+            <Key>uploader</Key>
+            <Value>${file?.uploader ?? "Unknown"}</Value>
+        </Tag>
+   </TagSet>
+</Tagging>`
+            })
             await prisma.file.update({
                 where: {
                     id: file!.id
@@ -183,18 +202,22 @@ export default new Hono<{
                     "Version": "2012-10-17",
                     "Statement": [{
                         "Effect": "Allow",
-                        "Action": "s3:PutObject",
+                        "Action": [
+                            "s3:PutObject",
+                            "s3:AbortMultipartUpload",
+                        ],
                         "Resource": `arn:aws:s3:::${c.env.S3_BUCKET}/${key}`,
-                        "Condition": {
-                            "StringEquals": {
-                                "s3:RequestObjectTag/status": "temp"
-                            }
-                        },
+                        // "Condition": {
+                        //     "StringEquals": {
+                        //         "s3:RequestObjectTag/status": "temp"
+                        //     }
+                        // },
                     }]
                 })
             }).toString()
         })
         if (!token.ok) {
+            console.log(await token.text())
             return c.json({ error: "获取临时凭证失败", success: false })
         }
         const parser = new XMLParser()
