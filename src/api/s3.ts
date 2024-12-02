@@ -44,7 +44,7 @@ export default new Hono<{
             }>
         }
         console.log("BODY:" + JSON.stringify(body))
-        if (body.EventName !== "s3:ObjectCreated:Put") {
+        if (body.EventName !== "s3:ObjectCreated:Put" && body.EventName !== "s3:ObjectCreated:CompleteMultipartUpload") {
             return c.json({ success: true })
         }
         const prisma = new PrismaClient({ adapter: new PrismaD1(c.env.DB) })
@@ -86,10 +86,6 @@ export default new Hono<{
 
             if (record.s3.object.size > 1024 * 1024 * 1024 * 2) {
                 await setError("文件大小超过 2G")
-                continue
-            }
-            if (!record.s3.object.key.startsWith(record.s3.object.eTag)) {
-                await setError("文件内容 md5 和文件名不匹配")
                 continue
             }
 

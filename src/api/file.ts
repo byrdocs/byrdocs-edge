@@ -57,13 +57,14 @@ export default new Hono<{
         })
 
         if (check.length) {
+            console.error("文件状态不正确", check)
             return c.json({
                 error: "文件状态不正确",
                 success: false,
                 files: check
             })
         }
-
+        console.log("Publishing", ids)
         await prisma.file.updateMany({
             where: {
                 id: {
@@ -118,7 +119,7 @@ export default new Hono<{
         if (responses.some(r => r.status === "rejected")) {
             return c.json({
                 success: false,
-                error: "部分文件删除失败",
+                error: "部分标签删除失败",
                 responses
             })
         }
