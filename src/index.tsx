@@ -121,7 +121,10 @@ const app = new Hono<{ Bindings: Bindings }>()
             const headers = new Headers(res.headers)
             headers.set("Content-Disposition", `attachment; filename*=UTF-8''${encodeURIComponent(filename)}`)
             return new Response(res.body, {
-                ...res,
+                status: res.status,
+                statusText: res.statusText,
+                webSocket: res.webSocket,
+                cf: res.cf,
                 headers
             })
         }
