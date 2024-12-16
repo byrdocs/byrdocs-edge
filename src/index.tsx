@@ -22,7 +22,23 @@ const ipChecker = createChecker(buptSubnets);
 
 async function page(c: Context) {
     const url = new URL(c.req.url, "https://byrdocs-frontend.pages.dev/")
-    return fetch("https://byrdocs-frontend.pages.dev" + c.req.url.slice(url.origin.length))
+    const shouldCache = url.pathname.startsWith("/assets") && (url.pathname.endsWith(".js") || url.pathname.endsWith(".css"))
+        || url.pathname.startsWith("/pdf-viewer")
+    const target = "https://byrdocs-frontend.pages.dev" + c.req.url.slice(url.origin.length)
+    if (shouldCache) {
+        const res = await fetch(target)
+        return new Response(res.body, {
+            status: res.status,
+            statusText: res.statusText,
+            cf: res.cf,
+            webSocket: res.webSocket,
+            headers: {
+                ...Object.fromEntries(res.headers.entries()),
+                "cache-control": "public, max-age=10800, s-maxage=10800"
+            }
+        })
+    }
+    return fetch(target)
 }
 
 export async function setCookie(c: Context) {
