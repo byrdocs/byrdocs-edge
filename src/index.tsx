@@ -24,21 +24,23 @@ async function page(c: Context) {
     const url = new URL(c.req.url, "https://byrdocs-frontend.pages.dev/")
     const shouldCache = url.pathname.startsWith("/assets") && (url.pathname.endsWith(".js") || url.pathname.endsWith(".css"))
         || url.pathname.startsWith("/pdf-viewer")
-    const target = "https://byrdocs-frontend.pages.dev" + c.req.url.slice(url.origin.length)
+    const res = fetch("https://byrdocs-frontend.pages.dev" + c.req.url.slice(url.origin.length), {
+        headers: Object.fromEntries(c.req.raw.headers.entries())
+    })
     if (shouldCache) {
-        const res = await fetch(target)
-        return new Response(res.body, {
-            status: res.status,
-            statusText: res.statusText,
-            cf: res.cf,
-            webSocket: res.webSocket,
+        const cacheRes = await res;
+        return new Response(cacheRes.body, {
+            status: cacheRes.status,
+            statusText: cacheRes.statusText,
+            cf: cacheRes.cf,
+            webSocket: cacheRes.webSocket,
             headers: {
-                ...Object.fromEntries(res.headers.entries()),
+                ...Object.fromEntries(cacheRes.headers.entries()),
                 "cache-control": "public, max-age=10800, s-maxage=10800"
             }
         })
     }
-    return fetch(target)
+    return res
 }
 
 export async function setCookie(c: Context) {
@@ -113,9 +115,7 @@ const app = new Hono<{ Bindings: Bindings }>()
             service: "s3",
         })
         const res = await fetch(await aws.sign(`${c.env.S3_HOST}/${c.env.S3_BUCKET}/` + path, {
-            headers: {
-                range: c.req.header("Range") || ""
-            }
+            headers: Object.fromEntries(c.req.raw.headers.entries())
         }))
         if (filename && res.status === 200) {
             const headers = new Headers(res.headers)
