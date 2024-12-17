@@ -114,9 +114,12 @@ const app = new Hono<{ Bindings: Bindings }>()
             secretAccessKey: c.env.S3_GET_SECRET_ACCESS_KEY,
             service: "s3",
         })
-        const res = await fetch(await aws.sign(`${c.env.S3_HOST}/${c.env.S3_BUCKET}/` + path, {
-            headers: Object.fromEntries(c.req.raw.headers.entries())
-        }))
+        const req = await aws.sign(`${c.env.S3_HOST}/${c.env.S3_BUCKET}/` + path, {
+            headers: Object.fromEntries(Array.from(c.req.raw.headers.entries()).filter(([key, _]) => [
+                "range", "if-modified-since", "if-none-match", "if-match", "if-unmodified-since"
+            ].includes(key)))
+        })
+        const res = await fetch(req)
         if (filename && res.status === 200) {
             const headers = new Headers(res.headers)
             headers.set("Content-Disposition", `attachment; filename*=UTF-8''${encodeURIComponent(filename)}`)
