@@ -161,6 +161,7 @@ export default {
             },
         });
         for (const file of files) {
+            console.log('DELETE', file.fileName, "Reason:", file.status === "Uploaded" ? "Expired" : "Timeout")
             await s3.fetch(`${env.S3_HOST}/${env.S3_BUCKET}/${file.fileName}`, {
                 method: "DELETE"
             })

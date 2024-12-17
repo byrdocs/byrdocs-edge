@@ -79,6 +79,7 @@ export default new Hono<{
                         errorMessage: reason
                     }
                 })
+                console.log('DELETE', record.s3.object.key, 'Reason:', reason)
                 await c.get("s3").fetch(`${c.env.S3_HOST}/${c.env.S3_BUCKET}/${record.s3.object.key}`, {
                     method: "DELETE"
                 })
