@@ -105,9 +105,12 @@ const app = new Hono<{ Bindings: Bindings }>()
                 const to = c.req.path + (toq.size > 0 ? "?" + toq.toString() : "")
                 return c.redirect("/login?" + new URLSearchParams({ to }).toString())
             }
-            const id: DurableObjectId = c.env.COUNTER.idFromName("counter");
-            const stub: DurableObjectStub<Counter<Bindings>> = c.env.COUNTER.get(id);
-            c.executionCtx.waitUntil(stub.add(path))
+            const range = c.req.header("Range")
+            if (!range || range.startsWith("bytes=0-")) {
+                const id: DurableObjectId = c.env.COUNTER.idFromName("counter");
+                const stub: DurableObjectStub<Counter<Bindings>> = c.env.COUNTER.get(id);
+                c.executionCtx.waitUntil(stub.add(path))
+            }
         }
         const aws = new AwsClient({
             accessKeyId: c.env.S3_GET_ACCESS_KEY_ID,
