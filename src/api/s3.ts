@@ -50,15 +50,16 @@ export default new Hono<{
         const prisma = new PrismaClient({ adapter: new PrismaD1(c.env.DB) })
         for (const record of body.Records) {
             if (record.s3.bucket.name !== c.env.S3_BUCKET) continue
+            const count = await prisma.file.count({
+                where: {
+                    fileName: record.s3.object.key
+                }
+            })
+            if (count == 0) continue;
             const file = await prisma.file.findFirst({
                 where: {
                     fileName: record.s3.object.key,
                     status: "Pending"
-                }
-            })
-            const count = await prisma.file.count({
-                where: {
-                    fileName: record.s3.object.key
                 }
             })
             if (count != 0 && !file) {
