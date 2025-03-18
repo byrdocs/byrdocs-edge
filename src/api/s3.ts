@@ -63,10 +63,6 @@ export default new Hono<{
                 }
             })
             if (count != 0 && !file) {
-                console.log("WARN: 未找到相关上传记录, 删除文件", record.s3.object.key)
-                await c.get("s3").fetch(`${c.env.S3_HOST}/${c.env.S3_BUCKET}/${record.s3.object.key}`, {
-                    method: "DELETE"
-                })
                 continue
             }
 
