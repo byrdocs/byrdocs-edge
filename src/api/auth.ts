@@ -3,8 +3,8 @@ import { Bindings } from '../types'
 import { OAuth } from '../objects/oauth';
 import { zValidator } from '@hono/zod-validator'
 import { z } from 'zod'
-import { login } from '../login';
 import { setCookie } from '..';
+import { byrdocs_login } from '@byrdocs/bupt-auth';
 
 export default new Hono<{
     Bindings: Bindings,
@@ -76,7 +76,7 @@ export default new Hono<{
     })), async c => {
         const { username, password, uuid } = c.req.valid("json")
         try {
-            await login(username, password)
+            await byrdocs_login(username, password, c.env.OCR_TOKEN)
             const { token, service, data } = await c.get('auth').loginBUPT(username, uuid)
             if (service === 'byrdocs') await setCookie(c)
             return c.json({ token, data, success: true })

@@ -15,4 +15,5 @@ export type Bindings = {
     GITHUB_CLIENT_ID: string;
     GITHUB_CLIENT_SECRET: string;
     DB: D1Database;
+    OCR_TOKEN: string;
 }

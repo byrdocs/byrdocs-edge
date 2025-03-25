@@ -8,7 +8,7 @@ import { createChecker } from 'is-in-subnet';
 import { buptSubnets } from '../bupt';
 
 import { Login } from './pages/login';
-import { login } from './login';
+import { byrdocs_login } from '@byrdocs/bupt-auth';
 
 import { AwsClient } from 'aws4fetch'
 import { Bindings } from './types';
@@ -67,7 +67,7 @@ const app = new Hono<{ Bindings: Bindings }>()
             return c.render(<Login errorMsg="输入不合法" ip={ip} />)
         }
         try {
-            if (await login(studentId, password)) {
+            if (await byrdocs_login(studentId, password, c.env.OCR_TOKEN)) {
                 await setCookie(c)
                 return c.redirect(c.req.query("to") || "/")
             }

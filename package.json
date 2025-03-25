@@ -15,6 +15,7 @@
     "typescript": "^5.6.3"
   },
   "dependencies": {
+    "@byrdocs/bupt-auth": "npm:@jsr/byrdocs__bupt-auth@^0.1.4",
     "@hono/zod-validator": "^0.4.1",
     "@prisma/adapter-d1": "^5.20.0",
     "@prisma/client": "^5.20.0",
