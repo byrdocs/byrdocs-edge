@@ -257,7 +257,7 @@ export const Login: FC<{ errorMsg?: string, ip: string }> = ({ errorMsg, ip }) =
                         <P><b>5. 开放源代码</b></P>
                         <P>
                             为增加透明度，我们提供了登录过程的源代码。您可以通过访问我们的
-                            <Link to="https://github.com/byrdocs/byrdocs-edge/blob/main/src/login.ts" className='mx-1'>
+                            <Link to="https://github.com/byrdocs/bupt-auth/blob/main/index.ts#L167" className='mx-1'>
                                 GitHub
                             </Link>
                         查看详细的实现方法。
