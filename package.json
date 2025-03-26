@@ -9,10 +9,11 @@
     "cf-typegen": "wrangler types"
   },
   "devDependencies": {
-    "@cloudflare/workers-types": "^4.20241112.0",
+    "@cloudflare/workers-types": "4.20250321.0",
     "@types/uuid": "^10.0.0",
     "prisma": "^5.20.0",
-    "typescript": "^5.6.3"
+    "typescript": "^5.6.3",
+    "wrangler": "^4.4.1"
   },
   "dependencies": {
     "@byrdocs/bupt-auth": "npm:@jsr/byrdocs__bupt-auth@^0.1.4",
@@ -25,7 +26,6 @@
     "is-in-subnet": "^4.0.1",
     "minio": "^8.0.1",
     "uuid": "^11.0.3",
-    "wrangler": "^3.87.0",
     "zod": "^3.23.8"
   },
   "packageManager": "pnpm@9.15.3+sha512.1f79bc245a66eb0b07c5d4d83131240774642caaa86ef7d0434ab47c0d16f66b04e21e0c086eb61e62c77efc4d7f7ec071afad3796af64892fae66509173893a"
