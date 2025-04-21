@@ -8,6 +8,16 @@ import { XMLParser } from 'fast-xml-parser'
 import { PrismaClient, File } from '@prisma/client'
 import { PrismaD1 } from '@prisma/adapter-d1'
 
+async function s3_test() {
+    const res = await fetch('https://s3.byrdocs.org/webhook-test')
+    if (res.status === 200) {
+        const text = await res.text()
+        if (text === "pong") return true
+        throw new Error(`Got unexpected response: ${text}`)
+    }
+    throw new Error(`HTTP Code is ${res.status}`)
+}
+
 export default new Hono<{
     Bindings: Bindings,
     Variables: {
@@ -147,7 +157,11 @@ export default new Hono<{
         })
     ), async c => {
         const { key } = await c.req.valid("json")
-
+        try {
+            await s3_test()
+        } catch (e) {
+            return c.json({ error: "S3 服务器错误", success: false })
+        }
         if (!/^[0-9a-f]{32}\.(zip|pdf)$/.test(key)) {
             return c.json({ error: "文件名不合法", success: false })
         }
@@ -175,7 +189,7 @@ export default new Hono<{
             .reduce((acc, f) => acc + f.fileSize!, 0)
 
         if (totalSize > 1024 * 1024 * 1024 * 5) { // 5G
-            return c.json({ error: "未发布文件总大小超过限制，请等待 PR 合并后再试", success: false })
+            return c.json({ error: "您的未发布文件总计大小超过限制，请等待其他文件 PR 合并后再试", success: false })
         }
 
         const sts = new AwsClient({
@@ -201,6 +215,7 @@ export default new Hono<{
                             "s3:AbortMultipartUpload",
                         ],
                         "Resource": `arn:aws:s3:::${c.env.S3_BUCKET}/${key}`,
+                        // Commented out to allow multipart upload
                         // "Condition": {
                         //     "StringEquals": {
                         //         "s3:RequestObjectTag/status": "temp"

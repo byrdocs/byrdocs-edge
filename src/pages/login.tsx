@@ -57,7 +57,11 @@ const Layout: FC = ({ current, children }: PropsWithChildren<{ current?: string 
                             if (cookie && getCookie() !== init_cookie) {
                                 if (submitted) {
 									if (to?.startsWith("/files/")) {
-										document.getElementById('success_info').innerHTML = "文件即将开始下载..."
+										document.getElementById('success_info').innerHTML = \`
+                                            文件即将开始下载...<br /><br />
+                                            如果 BYRDocs 帮助到了你，请考虑给我们一个
+                                            <a href="https://github.com/byrdocs/byrdocs-archive" target="_blank" class="text-blue-500 hover:underline dark:text-blue-400 dark:hover:text-blue-300">Star</a>！
+                                        \`
 										document.getElementById('continue_block').classList.add('hidden')
 										document.getElementById('success_block').classList.remove('pb-0')
 										go('success')
@@ -257,7 +261,7 @@ export const Login: FC<{ errorMsg?: string, ip: string }> = ({ errorMsg, ip }) =
                         <P><b>5. 开放源代码</b></P>
                         <P>
                             为增加透明度，我们提供了登录过程的源代码。您可以通过访问我们的
-                            <Link to="https://github.com/byrdocs/bupt-auth/blob/1d38445c1457c1b9eebd0a3ea26239a1b83cbc20/index.ts#L167" className='mx-1'>
+                            <Link to="https://github.com/byrdocs/byrdocs-edge/blob/1f96285f03ff26010879a0746fd44f3b8e508b4e/src/index.tsx#L71-L74" className='mx-1'>
                                 GitHub
                             </Link>
                         查看详细的实现方法。

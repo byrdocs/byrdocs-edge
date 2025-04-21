@@ -25,7 +25,9 @@ async function page(c: Context) {
     const shouldCache = url.pathname.startsWith("/assets") && (url.pathname.endsWith(".js") || url.pathname.endsWith(".css"))
         || url.pathname.startsWith("/pdf-viewer")
     const res = fetch("https://byrdocs-frontend.pages.dev" + c.req.url.slice(url.origin.length), {
-        headers: Object.fromEntries(c.req.raw.headers.entries())
+        headers: Object.fromEntries(
+            Array.from(c.req.raw.headers.entries()).filter(([key, _]) => key.toLowerCase() !== 'cf-connecting-ip')
+        )
     })
     if (shouldCache) {
         const cacheRes = await res;
