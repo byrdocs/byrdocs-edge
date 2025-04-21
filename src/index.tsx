@@ -53,6 +53,7 @@ export async function setCookie(c: Context) {
 }
 
 const app = new Hono<{ Bindings: Bindings }>()
+    .get('/ping', c => c.text('byrdocs-edge pong'))
     .get("/login", async c => {
         const ip = c.req.header("CF-Connecting-IP") || "未知"
         if (ip !== "未知" && ipChecker(ip)) return c.redirect(c.req.query("to") || "/")
