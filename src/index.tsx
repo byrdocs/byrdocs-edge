@@ -147,7 +147,7 @@ const app = new Hono<{ Bindings: Bindings }>()
             cf: {
                 image: {
                     format: "jpeg",
-                    height: 512,
+                    height: 384,
                     quality: 50,
                     fit: "scale-down"
                 }
