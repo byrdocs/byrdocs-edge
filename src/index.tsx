@@ -16,6 +16,7 @@ import { Bindings } from './types';
 import apiRoute from './api';
 import { PrismaD1 } from '@prisma/adapter-d1';
 import { PrismaClient } from '@prisma/client';
+import { sign } from './utils';
 export { OAuth } from './objects/oauth';
 
 const ipChecker = createChecker(buptSubnets);
@@ -115,16 +116,7 @@ const app = new Hono<{ Bindings: Bindings }>()
                 c.executionCtx.waitUntil(stub.add(path))
             }
         }
-        const aws = new AwsClient({
-            accessKeyId: c.env.S3_GET_ACCESS_KEY_ID,
-            secretAccessKey: c.env.S3_GET_SECRET_ACCESS_KEY,
-            service: "s3",
-        })
-        const req = await aws.sign(`${c.env.S3_HOST}/${c.env.S3_BUCKET}/` + path, {
-            headers: Object.fromEntries(Array.from(c.req.raw.headers.entries()).filter(([key, _]) => [
-                "range", "if-modified-since", "if-none-match", "if-match", "if-unmodified-since"
-            ].includes(key)))
-        })
+        const req = await sign(c.env, path, c.req.raw.headers)
         const res = await fetch(req)
         if (filename && res.status === 200) {
             const headers = new Headers(res.headers)
@@ -138,6 +130,39 @@ const app = new Hono<{ Bindings: Bindings }>()
             })
         }
         return res
+    })
+    .get("/thumbnail/:path{.*?}", async c => {
+        const path = c.req.param("path")
+        const key = `thumbnail/${path}`
+        const cached = await c.env.R2.get(key)
+        if (cached) {
+            return new Response(cached.body, {
+                headers: {
+                    "Content-Type": cached.httpMetadata?.contentType || "image/jpeg",
+                    "Cache-Control": "public, max-age=86400, s-maxage=86400"
+                }
+            })
+        }
+        const response = await fetch(c.req.url.replace("/thumbnail/", "/files/"), {
+            cf: {
+                image: {
+                    format: "jpeg",
+                    height: 512,
+                    quality: 50,
+                    fit: "scale-down"
+                }
+            }
+        })
+        if (response.ok || response.status === 304) {
+            await c.env.R2.put(key, response.clone().body)
+            return response
+        } else {
+            console.log("Thumbnail error:", response.status, response.statusText)
+            console.log(await response.text())
+            const webp_path = path.replace(/\.\w+$/, ".webp")
+            const webp_req = await sign(c.env, webp_path, c.req.raw.headers)
+            return fetch(webp_req)
+        }
     })
     .use(page)
 
