@@ -1,4 +1,5 @@
 import { Hono } from 'hono'
+import { cors } from 'hono/cors'
 import { Bindings } from '../types'
 import { verify } from 'hono/jwt'
 import { AwsClient } from 'aws4fetch'
@@ -155,7 +156,8 @@ export default new Hono<{
         z.object({
             key: z.string()
         })
-    ), async c => {
+    ),
+    async c => {
         const { key } = await c.req.valid("json")
         try {
             await s3_test()
@@ -170,7 +172,7 @@ export default new Hono<{
             method: "HEAD"
         })
         if (file.status === 200) {
-            return c.json({ error: "文件已存在", success: false })
+            return c.json({ error: "文件已存在", success: false, code: "FILE_EXISTS" })
         } else if (file.status !== 404) {
             return c.json({ error: "文件预检失败, status=" + file.status.toString(), success: false })
         }
@@ -270,6 +272,10 @@ export default new Hono<{
                 access_key_id: data.AssumeRoleResponse.AssumeRoleResult.Credentials.AccessKeyId,
                 secret_access_key: data.AssumeRoleResponse.AssumeRoleResult.Credentials.SecretAccessKey,
                 session_token: data.AssumeRoleResponse.AssumeRoleResult.Credentials.SessionToken
+            }
+        }, {
+            headers: {
+                "Content-Type": "application/x-www-form-urlencoded"
             }
         })
     })

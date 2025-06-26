@@ -1,8 +1,6 @@
 import { DurableObject } from "cloudflare:workers";
 import { v4 as uuidv4 } from 'uuid';
 import { sign } from 'hono/jwt'
-import { login } from "../login";
-
 import { Bindings } from "../types";
 
 type State = {
@@ -92,15 +90,17 @@ export class OAuth extends DurableObject {
             throw new Error(await res.text());
         }
         const { id, login } = await res.json() as { login: string, id: number };
-        const orgRes = await fetch(`https://api.github.com/orgs/byrdocs/members/${login}`, {
-            headers: {
-                Authorization: `Bearer ${ghToken.access_token}`,
-                Accept: "application/json",
-                "User-Agent": "ByrDocs"
+        if (state.service === 'byrdocs') {
+            const orgRes = await fetch(`https://api.github.com/orgs/byrdocs/members/${login}`, {
+                headers: {
+                    Authorization: `Bearer ${ghToken.access_token}`,
+                    Accept: "application/json",
+                    "User-Agent": "ByrDocs"
+                }
+            })
+            if (orgRes.status !== 204) {
+                throw new Error('您不是 byrdocs 组织的成员');
             }
-        })
-        if (orgRes.status !== 204) {
-            throw new Error('您不是 byrdocs 组织的成员');
         }
         const token = await sign({
             id: `GitHub-${id}`,

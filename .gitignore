@@ -172,3 +172,5 @@ dist
 .wrangler/
 
 .DS_Store
+
+ae.sh

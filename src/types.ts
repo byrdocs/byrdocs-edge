@@ -17,4 +17,5 @@ export type Bindings = {
     DB: D1Database;
     OCR_TOKEN: string;
     R2: R2Bucket;
+    AE: AnalyticsEngineDataset;
 }

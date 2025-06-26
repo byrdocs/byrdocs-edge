@@ -110,10 +110,26 @@ const app = new Hono<{ Bindings: Bindings }>()
                 return c.redirect("/login?" + new URLSearchParams({ to }).toString())
             }
             const range = c.req.header("Range")
-            if (!range || range.startsWith("bytes=0-")) {
-                const id: DurableObjectId = c.env.COUNTER.idFromName("counter");
-                const stub: DurableObjectStub<Counter<Bindings>> = c.env.COUNTER.get(id);
-                c.executionCtx.waitUntil(stub.add(path))
+            if (c.req.method === "GET" && (!range || range.startsWith("bytes=0-"))) {
+                if (filename) {
+                    const id: DurableObjectId = c.env.COUNTER.idFromName("counter");
+                    const stub: DurableObjectStub<Counter<Bindings>> = c.env.COUNTER.get(id);
+                    c.executionCtx.waitUntil(stub.add(path))
+                }
+                c.env.AE.writeDataPoint({
+                    blobs: [
+                        "download_file",
+                        path,
+                        filename || null,
+                        c.req.query("f") || null,
+                        ip || null,
+                        cookie || null,
+                        range || null
+                    ],
+                    indexes: [
+                        Math.random().toString(36).substring(2, 15)
+                    ]
+                })
             }
         }
         const req = await sign(c.env, path, c.req.raw.headers)
@@ -130,39 +146,6 @@ const app = new Hono<{ Bindings: Bindings }>()
             })
         }
         return res
-    })
-    .get("/thumbnail/:path{.*?}", async c => {
-        const path = c.req.param("path")
-        const key = `thumbnail/${path}`
-        const cached = await c.env.R2.get(key)
-        if (cached) {
-            return new Response(cached.body, {
-                headers: {
-                    "Content-Type": cached.httpMetadata?.contentType || "image/jpeg",
-                    "Cache-Control": "public, max-age=86400, s-maxage=86400"
-                }
-            })
-        }
-        const response = await fetch(c.req.url.replace("/thumbnail/", "/files/"), {
-            cf: {
-                image: {
-                    format: "jpeg",
-                    height: 384,
-                    quality: 50,
-                    fit: "scale-down"
-                }
-            }
-        })
-        if (response.ok || response.status === 304) {
-            await c.env.R2.put(key, response.clone().body)
-            return response
-        } else {
-            console.log("Thumbnail error:", response.status, response.statusText)
-            console.log(await response.text())
-            const webp_path = path.replace(/\.\w+$/, ".webp")
-            const webp_req = await sign(c.env, webp_path, c.req.raw.headers)
-            return fetch(webp_req)
-        }
     })
     .use(page)
 

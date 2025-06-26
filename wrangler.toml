@@ -27,6 +27,10 @@ database_id = "697122fa-0b02-4a41-9cb7-e139c28c4574"
 binding = 'R2'
 bucket_name = 'byrdocs'
 
+[[analytics_engine_datasets]]
+binding = "AE"
+dataset = "byrdocs"
+
 [triggers]
 crons = [
     "0 0 * * *"
