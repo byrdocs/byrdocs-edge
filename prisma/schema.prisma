@@ -28,5 +28,5 @@ model github_bind {
   id             String   @id
   createdAt      DateTime @default(now())
   installationId Int
-  repo           String
+  repo           String?
 }
